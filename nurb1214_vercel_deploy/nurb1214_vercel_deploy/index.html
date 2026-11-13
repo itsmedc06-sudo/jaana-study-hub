@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NURB 1214 - KON IIUM | Biochemistry for Nursing</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-top {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .course-tag {
+            font-size: 0.75rem;
+            color: #38bdf8;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        h1 { font-size: 1.35rem; margin-top: 0.2rem; }
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .nav-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .control-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+        }
+        .control-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        select {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text);
+            background: #f8fafc;
+        }
+        .stats {
+            display: flex;
+            gap: 1rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+        main {
+            max-width: 900px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        
+        /* Flashcard */
+        .flashcard-box {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .flashcard-box:hover { transform: translateY(-2px); }
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .card-content {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .card-label {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .card-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* Quiz & Cases */
+        .item-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .option-btn.correct { background: #dcfce7; border-color: var(--success); color: #14532d; font-weight: 600; }
+        .option-btn.wrong { background: #fee2e2; border-color: var(--danger); color: #7f1d1d; }
+        .rationale {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #f0f9ff;
+            border-left: 3px solid var(--primary);
+            font-size: 0.88rem;
+            display: none;
+        }
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: monospace;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <div>
+            <div class="course-tag">NURB 1214 - KON IIUM • Biochemistry for Nursing</div>
+            <h1>Hormones & Clinical Endocrinology Study Companion</h1>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('flashcards')">Flashcards (<span id="fc-count">0</span>)</button>
+            <button class="nav-btn" onclick="switchTab('quiz')">Practice Quiz (<span id="qz-count">0</span>)</button>
+            <button class="nav-btn" onclick="switchTab('cases')">Clinical Cases (<span id="cs-count">0</span>)</button>
+            <button class="nav-btn" onclick="switchTab('notes')">+ Add Notes / Modules</button>
+        </div>
+    </div>
+</header>
+
+<div class="control-bar">
+    <div class="control-inner">
+        <div>
+            <label for="chapter-select"><strong>CHAPTER:</strong></label>
+            <select id="chapter-select" onchange="filterChapter()">
+                <option value="all">All Chapters (Combined)</option>
+                <option value="ch1">Chapter 1: Hormones & Bioenergetics (NURB 1214)</option>
+                <option value="ch2">Chapter 2: Clinical Endocrinology & Pathology</option>
+            </select>
+        </div>
+        <div class="stats">
+            <span>Cards Mastered: <strong id="stat-mastered">0</strong></span>
+            <span>Quiz Score: <strong id="stat-quiz">0</strong></span>
+        </div>
+    </div>
+</div>
+
+<main>
+    <!-- FLASHCARDS PANEL -->
+    <div id="panel-flashcards" class="panel active">
+        <div class="flashcard-box" onclick="flipCard()">
+            <div class="card-meta">
+                <span id="fc-topic">TOPIC</span>
+                <span id="fc-index">Card 1 of 1</span>
+            </div>
+            <div class="card-content">
+                <div class="card-label" id="fc-side-label">QUESTION / CONCEPT</div>
+                <div class="card-text" id="fc-text">Loading...</div>
+            </div>
+            <div style="text-align:center; font-size:0.8rem; color:var(--muted);">Click card to flip</div>
+        </div>
+        <div class="card-controls">
+            <button class="btn" onclick="prevCard()">← Previous</button>
+            <button class="btn btn-success" onclick="markMastered()">✓ Mark Mastered</button>
+            <button class="btn btn-primary" onclick="nextCard()">Next →</button>
+        </div>
+    </div>
+
+    <!-- QUIZ PANEL -->
+    <div id="panel-quiz" class="panel">
+        <div id="quiz-container"></div>
+    </div>
+
+    <!-- CLINICAL CASES PANEL -->
+    <div id="panel-cases" class="panel">
+        <div id="cases-container"></div>
+    </div>
+
+    <!-- NOTES / IMPORT PANEL -->
+    <div id="panel-notes" class="panel">
+        <div class="item-card">
+            <h3>Add Custom Flashcard</h3>
+            <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;">Add extra notes or flashcards directly to your browser storage.</p>
+            <div style="margin-bottom:0.75rem;">
+                <label><strong>Chapter:</strong></label>
+                <select id="new-ch">
+                    <option value="ch1">Chapter 1: Hormones & Bioenergetics</option>
+                    <option value="ch2">Chapter 2: Clinical Endocrinology & Pathology</option>
+                </select>
+            </div>
+            <input type="text" id="new-q" placeholder="Question / Concept" style="width:100%; padding:0.6rem; margin-bottom:0.5rem; border:1px solid var(--border); border-radius:6px;">
+            <input type="text" id="new-a" placeholder="Answer / Explanation" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; border:1px solid var(--border); border-radius:6px;">
+            <button class="btn btn-primary" onclick="addCustomCard()">+ Save Flashcard</button>
+        </div>
+    </div>
+</main>
+
+<script>
+const defaultData = {
+    flashcards: [
+        // Chapter 1
+        { ch: "ch1", topic: "BASICS & FEEDBACK", q: "How do Leptin and Ghrelin regulate hunger and satiety?", a: "Leptin (secreted by adipose tissue) suppresses appetite and increases energy expenditure. Ghrelin (secreted by the stomach) stimulates hunger before meals." },
+        { ch: "ch1", topic: "CLASSIFICATION & TRANSPORT", q: "How do steroid hormones differ from peptide hormones in transport and receptor location?", a: "Steroid hormones are lipid-soluble, travel bound to carrier proteins in blood, and bind intracellular/nuclear receptors. Peptide hormones are water-soluble, travel free in plasma, and bind cell-surface membrane receptors." },
+        { ch: "ch1", topic: "RECEPTORS & SIGNALING", q: "What is the role of cAMP in GPCR hormone signaling?", a: "cAMP acts as a second messenger synthesized by adenylyl cyclase from ATP, activating Protein Kinase A (PKA) to phosphorylate target enzymes." },
+        { ch: "ch1", topic: "HIDDEN NETWORK & GI", q: "What are the primary actions of Secretin and Cholecystokinin (CCK)?", a: "Secretin stimulates pancreatic bicarbonate secretion to neutralize stomach acid. CCK stimulates gallbladder contraction and pancreatic digestive enzyme secretion." },
+        { ch: "ch1", topic: "METABOLISM & BIOENERGETICS", q: "How do Insulin and Glucagon oppositely regulate blood glucose?", a: "Insulin promotes glycogenesis, glycolysis, and lipogenesis (lowers blood glucose). Glucagon stimulates glycogenolysis and gluconeogenesis (raises blood glucose)." },
+        { ch: "ch1", topic: "RECEPTORS & SIGNALING", q: "Which receptor mechanism does Insulin utilize?", a: "Receptor Tyrosine Kinase (RTK), which undergoes autophosphorylation and activates IRS proteins and GLUT4 translocation." },
+        
+        // Chapter 2
+        { ch: "ch2", topic: "PITUITARY AXIS", q: "Compare Diabetes Insipidus (DI) and SIADH regarding ADH secretion and serum sodium.", a: "DI involves ADH deficiency/resistance causing polyuria and hypernatremia. SIADH involves excess ADH causing water retention and dilutional hyponatremia." },
+        { ch: "ch2", topic: "THYROID DISORDERS", q: "What is the biochemical profile of Primary Hypothyroidism vs. Graves' Disease?", a: "Primary Hypothyroidism: High TSH, Low Free T3/T4. Graves' Disease (Hyperthyroidism): Suppressed (low) TSH, High Free T3/T4 with TSH-receptor antibodies." },
+        { ch: "ch2", topic: "ADRENAL CORTEX", q: "Differentiate Addison's Disease from Cushing's Syndrome.", a: "Addison's (adrenal insufficiency): low cortisol/aldosterone, hyperkalemia, hyponatremia, hyperpigmentation (high ACTH). Cushing's: excess cortisol, hyperglycemia, central obesity, hypertension." },
+        { ch: "ch2", topic: "CALCIUM HOMEOSTASIS", q: "How do Parathyroid Hormone (PTH) and Calcitonin regulate serum calcium?", a: "PTH increases serum Ca2+ via bone resorption, renal Ca2+ reabsorption, and calcitriol activation. Calcitonin lowers serum Ca2+ by inhibiting osteoclast activity." },
+        { ch: "ch2", topic: "ADRENAL MEDULLA", q: "What is Pheochromocytoma and what are its hallmark clinical signs?", a: "A catecholamine-secreting tumor of the adrenal medulla causing paroxysmal severe hypertension, headache, palpitations, and diaphoresis." },
+        { ch: "ch2", topic: "PANCREATIC PATHOLOGY", q: "Why does Diabetic Ketoacidosis (DKA) occur primarily in Type 1 Diabetes?", a: "Absolute insulin deficiency triggers unrestrained lipolysis, flooding the liver with free fatty acids converted into acidic ketone bodies (acetoacetate, beta-hydroxybutyrate)." }
+    ],
+    quizzes: [
+        { ch: "ch1", q: "A patient has a mutation that prevents adenylyl cyclase activation. Which hormone's signaling pathway is most directly impaired?", options: ["Cortisol", "Glucagon", "Thyroxine (T4)", "Estrogen"], ans: 1, rationale: "Glucagon is a peptide hormone acting via Gs-coupled GPCRs that activate adenylyl cyclase to produce cAMP." },
+        { ch: "ch1", q: "Which hormone is synthesized from cholesterol and requires carrier proteins such as CBG or SHBG in circulation?", options: ["Insulin", "Epinephrine", "Cortisol", "Oxytocin"], ans: 2, rationale: "Cortisol is a steroid hormone derived from cholesterol; being hydrophobic, it binds corticosteroid-binding globulin (CBG)." },
+        { ch: "ch2", q: "A postoperative thyroidectomy patient develops positive Chvostek's and Trousseau's signs. Which biochemical abnormality explains this?", options: ["Hyperkalemia", "Hypocalcemia", "Hypernatremia", "Hypoglycemia"], ans: 1, rationale: "Accidental removal or ischemia of the parathyroid glands decreases PTH, leading to acute hypocalcemia and neuromuscular excitability." },
+        { ch: "ch2", q: "Lab results show TSH 0.02 mIU/L (low) and Free T4 4.8 ng/dL (high). Which clinical presentation matches these labs?", options: ["Bradycardia and weight gain", "Cold intolerance and dry skin", "Tachycardia, heat intolerance, and weight loss", "Hyperpigmentation and hypotension"], ans: 2, rationale: "Low TSH with elevated Free T4 indicates primary hyperthyroidism, increasing basal metabolic rate and sympathetic sensitivity." }
+    ],
+    cases: [
+        {
+            ch: "ch1",
+            title: "Case 1 (Ch 1): Post-Prandial Hypoglycemia & GLUT4 Signaling",
+            scenario: "A 24-year-old nursing student eats a high-carbohydrate meal. Within 45 minutes, blood glucose rises and pancreatic beta-cells release insulin.",
+            question: "Which intracellular event allows skeletal muscle cells to rapidly clear glucose from the bloodstream?",
+            options: ["Activation of nuclear transcription factors", "Translocation of GLUT4 vesicles to the plasma membrane", "Inhibition of hexokinase", "Activation of glycogen phosphorylase"],
+            ans: 1,
+            rationale: "Insulin binding to its Receptor Tyrosine Kinase triggers PI3K/Akt signaling, causing intracellular GLUT4 vesicles to fuse with the cell membrane."
+        },
+        {
+            ch: "ch2",
+            title: "Case 2 (Ch 2): Acute Adrenal Crisis Management",
+            scenario: "A 38-year-old female with known Addison's disease presents to the ED with vomiting, BP 78/46 mmHg, Na+ 124 mEq/L, K+ 6.3 mEq/L, and glucose 54 mg/dL.",
+            question: "What is the immediate priority pharmacological intervention?",
+            options: ["IV Regular Insulin", "IV Hydrocortisone and 0.9% Normal Saline", "Oral Levothyroxine", "Subcutaneous Calcitonin"],
+            ans: 1,
+            rationale: "Adrenal crisis requires immediate IV glucocorticoid replacement (Hydrocortisone) and isotonic fluid resuscitation to correct shock and hypoglycemia."
+        }
+    ]
+};
+
+let state = {
+    chapter: 'all',
+    currentIndex: 0,
+    isFlipped: false,
+    mastered: new Set(),
+    quizScore: 0,
+    answeredQuizzes: new Set(),
+    customCards: JSON.parse(localStorage.getItem('nurb1214_custom') || '[]')
+};
+
+function getFilteredCards() {
+    const all = [...defaultData.flashcards, ...state.customCards];
+    return state.chapter === 'all' ? all : all.filter(c => c.ch === state.chapter);
+}
+
+function getFilteredQuizzes() {
+    return state.chapter === 'all' ? defaultData.quizzes : defaultData.quizzes.filter(q => q.ch === state.chapter);
+}
+
+function getFilteredCases() {
+    return state.chapter === 'all' ? defaultData.cases : defaultData.cases.filter(c => c.ch === state.chapter);
+}
+
+function renderAll() {
+    const cards = getFilteredCards();
+    const quizzes = getFilteredQuizzes();
+    const cases = getFilteredCases();
+
+    document.getElementById('fc-count').innerText = cards.length;
+    document.getElementById('qz-count').innerText = quizzes.length;
+    document.getElementById('cs-count').innerText = cases.length;
+    document.getElementById('stat-mastered').innerText = `${state.mastered.size} / ${cards.length}`;
+    document.getElementById('stat-quiz').innerText = `${state.quizScore} / ${quizzes.length}`;
+
+    // Render Flashcard
+    if (cards.length > 0) {
+        if (state.currentIndex >= cards.length) state.currentIndex = 0;
+        const card = cards[state.currentIndex];
+        document.getElementById('fc-topic').innerText = `${card.ch.toUpperCase()} • ${card.topic}`;
+        document.getElementById('fc-index').innerText = `Card ${state.currentIndex + 1} of ${cards.length}`;
+        document.getElementById('fc-side-label').innerText = state.isFlipped ? 'ANSWER / EXPLANATION' : 'QUESTION / CONCEPT';
+        document.getElementById('fc-text').innerText = state.isFlipped ? card.a : card.q;
+    }
+
+    // Render Quiz
+    const qzContainer = document.getElementById('quiz-container');
+    qzContainer.innerHTML = quizzes.map((item, idx) => `
+        <div class="item-card">
+            <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.3rem;">${item.ch.toUpperCase()} • QUESTION ${idx + 1}</div>
+            <p><strong>${item.q}</strong></p>
+            <div>
+                ${item.options.map((opt, oIdx) => `
+                    <button class="option-btn" onclick="checkQuiz(${idx}, ${oIdx}, this)">${opt}</button>
+                `).join('')}
+            </div>
+            <div class="rationale" id="qz-rat-${idx}"><strong>Rationale:</strong> ${item.rationale}</div>
+        </div>
+    `).join('');
+
+    // Render Cases
+    const csContainer = document.getElementById('cases-container');
+    csContainer.innerHTML = cases.map((item, idx) => `
+        <div class="item-card">
+            <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.3rem;">${item.title}</div>
+            <p style="background:#f8fafc; padding:0.75rem; border-radius:6px; margin:0.5rem 0;">${item.scenario}</p>
+            <p><strong>${item.question}</strong></p>
+            <div>
+                ${item.options.map((opt, oIdx) => `
+                    <button class="option-btn" onclick="checkCase(${idx}, ${oIdx}, this)">${opt}</button>
+                `).join('')}
+            </div>
+            <div class="rationale" id="cs-rat-${idx}"><strong>Clinical Rationale:</strong> ${item.rationale}</div>
+        </div>
+    `).join('');
+}
+
+function flipCard() {
+    state.isFlipped = !state.isFlipped;
+    renderAll();
+}
+
+function nextCard() {
+    const cards = getFilteredCards();
+    state.currentIndex = (state.currentIndex + 1) % cards.length;
+    state.isFlipped = false;
+    renderAll();
+}
+
+function prevCard() {
+    const cards = getFilteredCards();
+    state.currentIndex = (state.currentIndex - 1 + cards.length) % cards.length;
+    state.isFlipped = false;
+    renderAll();
+}
+
+function markMastered() {
+    const cards = getFilteredCards();
+    if (cards[state.currentIndex]) {
+        state.mastered.add(cards[state.currentIndex].q);
+        nextCard();
+    }
+}
+
+function checkQuiz(qIdx, oIdx, btn) {
+    const quizzes = getFilteredQuizzes();
+    const item = quizzes[qIdx];
+    const parent = btn.parentElement;
+    const buttons = parent.querySelectorAll('.option-btn');
+    buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === item.ans) b.classList.add('correct');
+        else if (i === oIdx) b.classList.add('wrong');
+    });
+    if (oIdx === item.ans && !state.answeredQuizzes.has(item.q)) {
+        state.quizScore++;
+        state.answeredQuizzes.add(item.q);
+        document.getElementById('stat-quiz').innerText = `${state.quizScore} / ${quizzes.length}`;
+    }
+    document.getElementById(`qz-rat-${qIdx}`).style.display = 'block';
+}
+
+function checkCase(cIdx, oIdx, btn) {
+    const cases = getFilteredCases();
+    const item = cases[cIdx];
+    const parent = btn.parentElement;
+    const buttons = parent.querySelectorAll('.option-btn');
+    buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === item.ans) b.classList.add('correct');
+        else if (i === oIdx) b.classList.add('wrong');
+    });
+    document.getElementById(`cs-rat-${cIdx}`).style.display = 'block';
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`panel-${tab}`).classList.add('active');
+    event.target.classList.add('active');
+}
+
+function filterChapter() {
+    state.chapter = document.getElementById('chapter-select').value;
+    state.currentIndex = 0;
+    state.isFlipped = false;
+    renderAll();
+}
+
+function addCustomCard() {
+    const ch = document.getElementById('new-ch').value;
+    const q = document.getElementById('new-q').value.trim();
+    const a = document.getElementById('new-a').value.trim();
+    if (!q || !a) return alert('Please fill both question and answer.');
+    state.customCards.push({ ch, topic: 'CUSTOM NOTE', q, a });
+    localStorage.setItem('nurb1214_custom', JSON.stringify(state.customCards));
+    document.getElementById('new-q').value = '';
+    document.getElementById('new-a').value = '';
+    alert('Flashcard saved!');
+    renderAll();
+}
+
+renderAll();
+</script>
+</body>
+</html>
