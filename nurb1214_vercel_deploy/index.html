@@ -1,505 +1,2685 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NURB 1214 - KON IIUM | Biochemistry for Nursing</title>
-    <style>
-        :root {
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --bg: #f1f5f9;
-            --card: #ffffff;
-            --text: #0f172a;
-            --muted: #64748b;
-            --border: #e2e8f0;
-            --success: #16a34a;
-            --danger: #dc2626;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-        }
-        header {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: white;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header-top {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-        .course-tag {
-            font-size: 0.75rem;
-            color: #38bdf8;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        h1 { font-size: 1.35rem; margin-top: 0.2rem; }
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .nav-btn {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.15);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        .nav-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        .control-bar {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-        }
-        .control-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.85rem;
-        }
-        select {
-            padding: 0.4rem 0.75rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-weight: 600;
-            color: var(--text);
-            background: #f8fafc;
-        }
-        .stats {
-            display: flex;
-            gap: 1rem;
-            color: var(--muted);
-            font-weight: 600;
-        }
-        main {
-            max-width: 900px;
-            margin: 1.5rem auto;
-            padding: 0 1rem;
-        }
-        .panel { display: none; }
-        .panel.active { display: block; }
-        
-        /* Flashcard */
-        .flashcard-box {
-            background: var(--card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 2rem;
-            min-height: 260px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-        .flashcard-box:hover { transform: translateY(-2px); }
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--muted);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .card-content {
-            text-align: center;
-            margin: 2rem 0;
-        }
-        .card-label {
-            font-size: 0.75rem;
-            color: var(--primary);
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-        .card-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .card-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-        }
-        .btn {
-            padding: 0.5rem 1.25rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: white;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        .btn-success {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-
-        /* Quiz & Cases */
-        .item-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .option-btn {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 0.75rem 1rem;
-            margin-top: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: #f8fafc;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-        .option-btn.correct { background: #dcfce7; border-color: var(--success); color: #14532d; font-weight: 600; }
-        .option-btn.wrong { background: #fee2e2; border-color: var(--danger); color: #7f1d1d; }
-        .rationale {
-            margin-top: 0.75rem;
-            padding: 0.75rem;
-            background: #f0f9ff;
-            border-left: 3px solid var(--primary);
-            font-size: 0.88rem;
-            display: none;
-        }
-        textarea {
-            width: 100%;
-            min-height: 180px;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: monospace;
-            margin-top: 0.5rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NURB 1214 Hormones — Interactive Flashcards, Quiz &amp; Clinical Case Hub</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top right, #f0fdfa 0%, #f8fafc 45%, #f1f5f9 100%);
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      min-height: 330px;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 1.25rem;
+      box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+    .premium-surface {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
 
-<header>
-    <div class="header-top">
+  <!-- Top Header & Navigation -->
+  <header class="bg-gradient-to-r from-slate-900 via-teal-950 to-emerald-950 text-white shadow-lg border-b border-teal-800/60 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3.5">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 rounded-full">NURB 1214 · KON IIUM</span>
+          <span class="text-xs text-teal-200/90 font-medium">Biochemistry for Nursing · Study Portal</span>
+        </div>
+        <h1 class="font-display text-lg sm:text-xl font-extrabold tracking-tight mt-1 text-white">Jaana's Interactive Study Companion</h1>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <nav class="flex flex-wrap items-center bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/15 self-start md:self-auto gap-0.5" aria-label="Study Modes">
+        <button id="tabBtnNotes" type="button" onclick="switchTab('notes')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-200 hover:text-white">
+          Short Notes (12)
+        </button>
+        <button id="tabBtnFlashcards" type="button" onclick="switchTab('flashcards')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-teal-600 text-white shadow">
+          Flashcards (38)
+        </button>
+        <button id="tabBtnQuiz" type="button" onclick="switchTab('quiz')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-200 hover:text-white">
+          Practice Quiz (15)
+        </button>
+        <button id="tabBtnCases" type="button" onclick="switchTab('cases')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-200 hover:text-white">
+          Clinical Cases (8)
+        </button>
+        <button id="tabBtnManage" type="button" onclick="switchTab('manage')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-amber-300 hover:text-white">
+          + Add Notes / Modules
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Global Mastery Summary Bar -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+        <div class="flex items-center gap-1.5">
+          <label for="moduleSelectDropdown" class="text-xs font-bold uppercase tracking-wider text-teal-800">Chapter:</label>
+          <select id="moduleSelectDropdown" onchange="setActiveModule(this.value)" class="text-xs sm:text-sm font-semibold bg-teal-50 border border-teal-300 text-teal-900 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="ALL">All Chapters (Combined)</option>
+            <option value="Hormones (NURB 1214)">Ch 1: Hormones (NURB 1214)</option>
+          </select>
+        </div>
+        <span class="font-medium text-slate-600">Cards Mastered: <strong id="statMasteredCount" class="text-emerald-700">0 / 24</strong></span>
+        <span class="font-medium text-slate-600">Quiz Score: <strong id="statQuizScore" class="text-teal-700">0 / 15</strong></span>
+        <span class="font-medium text-slate-600">Cases Solved: <strong id="statCasesSolved" class="text-amber-700">0 / 8</strong></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="toastBanner" class="hidden px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200"></span>
+        <button id="btnResetAll" type="button" onclick="resetAllProgress()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-2.5 py-1 rounded-lg hover:bg-rose-50 transition">
+          Reset Progress
+        </button>
+      </div>
+    </div>
+    <div class="w-full bg-slate-100 h-1 overflow-hidden">
+      <div id="masteryProgressBar" class="bg-gradient-to-r from-teal-500 to-emerald-500 h-full transition-all duration-500" style="width: 8%;"></div>
+    </div>
+  </div>
+
+  <!-- Main Workspace Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
+
+    <!-- ==================== VIEW 0: SHORT NOTES ==================== -->
+    <section id="viewNotes" class="hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <div class="course-tag">NURB 1214 - KON IIUM • Biochemistry for Nursing</div>
-            <h1>Hormones & Clinical Endocrinology Study Companion</h1>
+          <h2 class="text-base font-bold text-slate-900">Quick Revision Short Notes</h2>
+          <p class="text-xs text-slate-600">Condensed high-yield points and exam pearls for each chapter (automatically generated when you upload any PDF/PPTX).</p>
         </div>
-        <div class="nav-tabs">
-            <button class="nav-btn active" onclick="switchTab('flashcards')">Flashcards (<span id="fc-count">0</span>)</button>
-            <button class="nav-btn" onclick="switchTab('quiz')">Practice Quiz (<span id="qz-count">0</span>)</button>
-            <button class="nav-btn" onclick="switchTab('cases')">Clinical Cases (<span id="cs-count">0</span>)</button>
-            <button class="nav-btn" onclick="switchTab('notes')">+ Add Notes / Modules</button>
+        <div class="flex items-center gap-2">
+          <input id="inputSearchNotes" type="text" oninput="renderShortNotesView()" placeholder="Search notes or keywords..." class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          <button id="btnGoUploadFromNotes" type="button" onclick="switchTab('manage')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition shrink-0">
+            + Upload PDF
+          </button>
         </div>
-    </div>
-</header>
+      </div>
+      <div id="shortNotesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
 
-<div class="control-bar">
-    <div class="control-inner">
+    <!-- ==================== VIEW 1: FLASHCARDS ==================== -->
+    <section id="viewFlashcards" class="space-y-5">
+      <!-- Category & Deck Filter Bar -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-1.5" id="flashcardCategoryPills">
+          <button type="button" onclick="setFlashcardCategory('All')" data-fc-cat="All" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white">All (24)</button>
+          <button type="button" onclick="setFlashcardCategory('Basics & Feedback')" data-fc-cat="Basics & Feedback" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Basics &amp; Feedback</button>
+          <button type="button" onclick="setFlashcardCategory('Classification & Transport')" data-fc-cat="Classification & Transport" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Classification &amp; Transport</button>
+          <button type="button" onclick="setFlashcardCategory('Receptors & Signaling')" data-fc-cat="Receptors & Signaling" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Receptors &amp; Signaling</button>
+          <button type="button" onclick="setFlashcardCategory('Hidden Network & GI')" data-fc-cat="Hidden Network & GI" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Hidden Network &amp; GI</button>
+          <button type="button" onclick="setFlashcardCategory('Metabolism & Cases')" data-fc-cat="Metabolism & Cases" class="fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Metabolism &amp; Pathology</button>
+        </div>
+
+        <div class="flex items-center gap-2 self-end md:self-auto">
+          <button id="btnToggleReviewFilter" type="button" onclick="toggleReviewOnlyFilter()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 transition">
+            Show Review Only: OFF
+          </button>
+          <button id="btnShuffleDeck" type="button" onclick="shuffleFlashcards()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition">
+            Shuffle Deck
+          </button>
+        </div>
+      </div>
+
+      <!-- Flashcard 3D Stage -->
+      <div class="max-w-2xl mx-auto">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2 px-1">
+          <span id="fcCategoryBadge" class="text-teal-700 uppercase tracking-wider">Basics &amp; Feedback</span>
+          <span id="fcCounterText">Card 1 of 24</span>
+        </div>
+
+        <div class="perspective-1000 cursor-pointer select-none" onclick="flipCurrentCard()">
+          <div id="fcInner" class="flip-card-inner">
+            <!-- Front of Card -->
+            <div class="flip-card-front bg-white border border-slate-200/90 border-t-4 border-t-teal-600 p-6 sm:p-9 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span id="fcSlideTagFront" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600">Slide 4</span>
+                <span id="fcStatusBadgeFront" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Unseen</span>
+              </div>
+              <div class="my-auto py-4 text-center">
+                <p class="text-xs uppercase tracking-widest text-teal-600 font-bold mb-2">Question / Concept</p>
+                <h2 id="fcQuestionText" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug"></h2>
+              </div>
+              <div class="text-center text-xs text-slate-400 font-medium">
+                Tap card or press <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">Space</kbd> to flip answer
+              </div>
+            </div>
+
+            <!-- Back of Card -->
+            <div class="flip-card-back bg-gradient-to-br from-slate-900 via-teal-950 to-teal-900 text-white border border-teal-700/80 p-6 sm:p-9 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-teal-800 text-teal-200">Model Answer</span>
+                <span id="fcSlideTagBack" class="text-xs text-teal-200 font-medium">Slide 4</span>
+              </div>
+              <div class="my-auto py-2 space-y-3 overflow-y-auto max-h-52">
+                <p id="fcAnswerText" class="text-sm sm:text-base font-medium text-white leading-relaxed"></p>
+                <div class="bg-teal-950/80 border border-teal-700/80 rounded-xl p-3 text-xs text-teal-100">
+                  <strong class="text-amber-300 uppercase tracking-wider block mb-0.5">Exam / Nursing Pearl:</strong>
+                  <span id="fcPearlText"></span>
+                </div>
+              </div>
+              <div class="text-center text-xs text-teal-300 font-medium">
+                Tap card to flip back
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Controls -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <button id="btnPrevCard" type="button" onclick="navigateFlashcard(-1)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
+              &larr; Prev
+            </button>
+            <button id="btnFlipCard" type="button" onclick="flipCurrentCard()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition">
+              Flip Card
+            </button>
+            <button id="btnNextCard" type="button" onclick="navigateFlashcard(1)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
+              Next &rarr;
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnMarkReview" type="button" onclick="markCardStatus('review')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 transition">
+              Needs Review
+            </button>
+            <button id="btnMarkMastered" type="button" onclick="markCardStatus('mastered')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm">
+              &#10003; Mastered
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: PRACTICE QUIZ ==================== -->
+    <section id="viewQuiz" class="hidden space-y-5">
+      <!-- Quiz Topic Filter & Score Bar -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-1.5" id="quizCategoryPills">
+          <button type="button" onclick="setQuizCategory('All')" data-qz-cat="All" class="qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white">All Questions (15)</button>
+          <button type="button" onclick="setQuizCategory('Classification & Transport')" data-qz-cat="Classification & Transport" class="qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Classification &amp; Transport</button>
+          <button type="button" onclick="setQuizCategory('Signaling & Receptors')" data-qz-cat="Signaling & Receptors" class="qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Signaling &amp; Receptors</button>
+          <button type="button" onclick="setQuizCategory('GI & Non-Classical')" data-qz-cat="GI & Non-Classical" class="qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">GI &amp; Non-Classical</button>
+          <button type="button" onclick="setQuizCategory('Metabolism & Clinical')" data-qz-cat="Metabolism & Clinical" class="qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Metabolism &amp; Clinical</button>
+        </div>
+
+        <div class="flex items-center gap-3 self-end md:self-auto">
+          <span id="quizStreakBadge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">Streak: 0</span>
+          <button id="btnResetQuiz" type="button" onclick="resetQuiz()" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition">
+            Restart Quiz
+          </button>
+        </div>
+      </div>
+
+      <!-- Question Number Dots -->
+      <div id="quizDotsContainer" class="flex flex-wrap items-center gap-1.5"></div>
+
+      <!-- Active Quiz Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7 space-y-5">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+          <span id="qzTopicLabel" class="text-teal-700 uppercase tracking-wider">Classification &amp; Transport</span>
+          <span id="qzProgressLabel">Question 1 of 15 · Slide 23</span>
+        </div>
+
+        <h2 id="qzQuestionPrompt" class="text-base sm:text-lg font-bold text-slate-900 leading-snug"></h2>
+
+        <!-- Options List -->
+        <div id="qzOptionsList" class="space-y-2.5"></div>
+
+        <!-- Explanation Box (Hidden until answered) -->
+        <div id="qzExplanationBox" class="hidden rounded-xl p-4 border text-xs sm:text-sm space-y-1.5">
+          <div id="qzFeedbackHeader" class="font-bold text-sm"></div>
+          <p id="qzExplanationText" class="text-slate-700 leading-relaxed"></p>
+        </div>
+
+        <!-- Prev / Next Question Navigation -->
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button id="btnPrevQuiz" type="button" onclick="navigateQuiz(-1)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            &larr; Previous Question
+          </button>
+          <button id="btnNextQuiz" type="button" onclick="navigateQuiz(1)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-teal-700 text-white hover:bg-teal-800 transition">
+            Next Question &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: CLINICAL CASES ==================== -->
+    <section id="viewCases" class="hidden space-y-5">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <label for="chapter-select"><strong>CHAPTER:</strong></label>
-            <select id="chapter-select" onchange="filterChapter()">
-                <option value="all">All Chapters (Combined)</option>
-                <option value="ch1">Chapter 1: Hormones & Bioenergetics (NURB 1214)</option>
-                <option value="ch2">Chapter 2: Clinical Endocrinology & Pathology</option>
-            </select>
+          <h2 class="text-base font-bold text-slate-900">Clinical Case Simulator &amp; Lecture Scenarios (Slides 88–95)</h2>
+          <p class="text-xs text-slate-600">Practice the 3 unanswered patient cases (Madam Chong, Mr. Zul, Puan Aida) and the 5 clinical scenarios from the lecture deck.</p>
         </div>
-        <div class="stats">
-            <span>Cards Mastered: <strong id="stat-mastered">0</strong></span>
-            <span>Quiz Score: <strong id="stat-quiz">0</strong></span>
-        </div>
-    </div>
-</div>
+        <button id="btnRevealAllCaseAnswers" type="button" onclick="revealAllCurrentCaseSteps()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 transition self-start sm:self-auto shrink-0">
+          Reveal All Answers in Case
+        </button>
+      </div>
 
-<main>
-    <!-- FLASHCARDS PANEL -->
-    <div id="panel-flashcards" class="panel active">
-        <div class="flashcard-box" onclick="flipCard()">
-            <div class="card-meta">
-                <span id="fc-topic">TOPIC</span>
-                <span id="fc-index">Card 1 of 1</span>
+      <!-- Case Selector Pills -->
+      <div id="caseSelectorBar" class="flex flex-wrap gap-2"></div>
+
+      <!-- Active Case Detail Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <!-- Patient Banner -->
+        <div class="bg-slate-900 text-white p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <span id="caseBadgeSlide" class="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-amber-500 text-slate-950">Unanswered Exam Case · Slide 92</span>
+            <span id="caseBadgeDisorder" class="text-xs font-semibold text-teal-300">Primary Hypothyroidism</span>
+          </div>
+          <h3 id="caseTitle" class="text-lg sm:text-xl font-extrabold"></h3>
+          <p id="caseScenarioText" class="text-xs sm:text-sm text-slate-200 mt-2 leading-relaxed"></p>
+          <div id="caseVitalsRow" class="mt-4 flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Interactive Sub-Questions for the Case -->
+        <div id="caseStepsContainer" class="p-5 sm:p-6 space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: ADD NOTES & MANAGE MODULES ==================== -->
+    <section id="viewManage" class="hidden space-y-6">
+      <!-- AUTOMATIC PDF / PPTX UPLOADER BOX -->
+      <div class="bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-md border border-teal-700 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <span class="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-amber-400 text-slate-950">Automatic Lecture Converter</span>
+            <h2 class="text-lg sm:text-xl font-extrabold mt-1">Upload Any Lecture PDF or PPTX File</h2>
+            <p class="text-xs sm:text-sm text-teal-100 mt-0.5">Select any <code class="bg-teal-950/60 px-1.5 py-0.5 rounded">.pdf</code> or <code class="bg-teal-950/60 px-1.5 py-0.5 rounded">.pptx</code> file directly from your phone or laptop. The app reads every slide and automatically builds Short Notes, Flashcards, Practice Quiz (MCQs), and Clinical Cases!</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-teal-950/60 p-4 rounded-xl border border-teal-700/70">
+          <div>
+            <label for="inputAutoChapterName" class="block text-xs font-semibold text-teal-200 mb-1">1. Chapter Name (Optional — auto-detected from file)</label>
+            <input id="inputAutoChapterName" type="text" placeholder="e.g., Ch 3: Lipids & Membranes" class="w-full rounded-xl bg-white text-slate-900 px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-400" />
+          </div>
+          <div>
+            <label for="inputPdfFilePicker" class="block text-xs font-semibold text-teal-200 mb-1">2. Choose Lecture PDF or PPTX File</label>
+            <input id="inputPdfFilePicker" type="file" accept=".pdf,.pptx,.txt" class="w-full rounded-xl bg-white text-slate-900 px-2.5 py-1.5 text-xs sm:text-sm file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800" />
+          </div>
+          <div class="flex flex-col justify-end">
+            <button id="btnProcessUploadedFile" type="button" onclick="processUploadedLectureFile()" class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition shadow-md">
+              ⚡ Auto-Generate Notes, Cards &amp; Quiz
+            </button>
+          </div>
+        </div>
+
+        <!-- Optional Gemini API Key row + live status bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs text-teal-200">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span>Mode: <strong class="text-amber-300">Instant Smart Built-in Parser (No Key Required)</strong></span>
+            <span>·</span>
+            <label for="inputOptionalGeminiKey" class="underline cursor-pointer">Optional Gemini AI Key:</label>
+            <input id="inputOptionalGeminiKey" type="password" onchange="saveOptionalApiKey(this.value)" placeholder="Paste free AI Studio key (optional)" class="rounded-lg bg-teal-950/90 border border-teal-700 px-2.5 py-1 text-xs text-white placeholder-teal-400 w-52" />
+          </div>
+          <span id="uploadProgressStatus" class="font-semibold text-amber-300">Ready to convert any PDF or PPTX</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800">Expandable Study Hub</span>
+          <h2 class="text-lg font-extrabold text-slate-900 mt-1">Add New Chapters, Study Notes, Questions &amp; JSON Packs</h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-0.5">When Jaana sends new lecture PDFs or notes, add them as a new chapter below or paste a generated JSON Study Pack to expand this app automatically.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button id="btnExportJsonPack" type="button" onclick="exportCustomDataJson()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 transition">
+            Export Backup JSON
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Card A: Create Chapter & Add Flashcard -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">1. Add New Flashcard / Study Note</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="inputFcModule" class="block text-xs font-semibold text-slate-700 mb-1">Chapter / Module Name</label>
+              <input id="inputFcModule" type="text" value="Ch 2: Enzymes & Metabolism" placeholder="e.g., Ch 2: Enzymes" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
-            <div class="card-content">
-                <div class="card-label" id="fc-side-label">QUESTION / CONCEPT</div>
-                <div class="card-text" id="fc-text">Loading...</div>
+            <div>
+              <label for="inputFcCategory" class="block text-xs font-semibold text-slate-700 mb-1">Topic Tag</label>
+              <input id="inputFcCategory" type="text" value="Custom Notes" placeholder="e.g., Enzyme Kinetics" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
-            <div style="text-align:center; font-size:0.8rem; color:var(--muted);">Click card to flip</div>
-        </div>
-        <div class="card-controls">
-            <button class="btn" onclick="prevCard()">← Previous</button>
-            <button class="btn btn-success" onclick="markMastered()">✓ Mark Mastered</button>
-            <button class="btn btn-primary" onclick="nextCard()">Next →</button>
-        </div>
-    </div>
-
-    <!-- QUIZ PANEL -->
-    <div id="panel-quiz" class="panel">
-        <div id="quiz-container"></div>
-    </div>
-
-    <!-- CLINICAL CASES PANEL -->
-    <div id="panel-cases" class="panel">
-        <div id="cases-container"></div>
-    </div>
-
-    <!-- NOTES / IMPORT PANEL -->
-    <div id="panel-notes" class="panel">
-        <div class="item-card">
-            <h3>Add Custom Flashcard</h3>
-            <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;">Add extra notes or flashcards directly to your browser storage.</p>
-            <div style="margin-bottom:0.75rem;">
-                <label><strong>Chapter:</strong></label>
-                <select id="new-ch">
-                    <option value="ch1">Chapter 1: Hormones & Bioenergetics</option>
-                    <option value="ch2">Chapter 2: Clinical Endocrinology & Pathology</option>
-                </select>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="inputFcSlide" class="block text-xs font-semibold text-slate-700 mb-1">Slide / Page Reference</label>
+              <input id="inputFcSlide" type="text" value="New Note" placeholder="e.g., Slide 12" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
-            <input type="text" id="new-q" placeholder="Question / Concept" style="width:100%; padding:0.6rem; margin-bottom:0.5rem; border:1px solid var(--border); border-radius:6px;">
-            <input type="text" id="new-a" placeholder="Answer / Explanation" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; border:1px solid var(--border); border-radius:6px;">
-            <button class="btn btn-primary" onclick="addCustomCard()">+ Save Flashcard</button>
+            <div>
+              <label for="inputFcPearl" class="block text-xs font-semibold text-slate-700 mb-1">Exam / Memory Tip</label>
+              <input id="inputFcPearl" type="text" placeholder="Short shortcut or clinical pearl..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+          </div>
+          <div>
+            <label for="inputFcQuestion" class="block text-xs font-semibold text-slate-700 mb-1">Question / Concept Prompt</label>
+            <input id="inputFcQuestion" type="text" placeholder="Enter question or key concept title..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
+          <div>
+            <label for="inputFcAnswer" class="block text-xs font-semibold text-slate-700 mb-1">Detailed Study Note / Answer</label>
+            <textarea id="inputFcAnswer" rows="3" placeholder="Enter simple explanation or answer points..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+          </div>
+          <button id="btnAddFlashcard" type="button" onclick="addCustomFlashcardFromForm()" class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-teal-700 text-white hover:bg-teal-800 transition shadow-sm">
+            + Save Flashcard to Module
+          </button>
         </div>
-    </div>
-</main>
 
-<script>
-const defaultData = {
-    flashcards: [
-        // Chapter 1
-        { ch: "ch1", topic: "BASICS & FEEDBACK", q: "How do Leptin and Ghrelin regulate hunger and satiety?", a: "Leptin (secreted by adipose tissue) suppresses appetite and increases energy expenditure. Ghrelin (secreted by the stomach) stimulates hunger before meals." },
-        { ch: "ch1", topic: "CLASSIFICATION & TRANSPORT", q: "How do steroid hormones differ from peptide hormones in transport and receptor location?", a: "Steroid hormones are lipid-soluble, travel bound to carrier proteins in blood, and bind intracellular/nuclear receptors. Peptide hormones are water-soluble, travel free in plasma, and bind cell-surface membrane receptors." },
-        { ch: "ch1", topic: "RECEPTORS & SIGNALING", q: "What is the role of cAMP in GPCR hormone signaling?", a: "cAMP acts as a second messenger synthesized by adenylyl cyclase from ATP, activating Protein Kinase A (PKA) to phosphorylate target enzymes." },
-        { ch: "ch1", topic: "HIDDEN NETWORK & GI", q: "What are the primary actions of Secretin and Cholecystokinin (CCK)?", a: "Secretin stimulates pancreatic bicarbonate secretion to neutralize stomach acid. CCK stimulates gallbladder contraction and pancreatic digestive enzyme secretion." },
-        { ch: "ch1", topic: "METABOLISM & BIOENERGETICS", q: "How do Insulin and Glucagon oppositely regulate blood glucose?", a: "Insulin promotes glycogenesis, glycolysis, and lipogenesis (lowers blood glucose). Glucagon stimulates glycogenolysis and gluconeogenesis (raises blood glucose)." },
-        { ch: "ch1", topic: "RECEPTORS & SIGNALING", q: "Which receptor mechanism does Insulin utilize?", a: "Receptor Tyrosine Kinase (RTK), which undergoes autophosphorylation and activates IRS proteins and GLUT4 translocation." },
-        
-        // Chapter 2
-        { ch: "ch2", topic: "PITUITARY AXIS", q: "Compare Diabetes Insipidus (DI) and SIADH regarding ADH secretion and serum sodium.", a: "DI involves ADH deficiency/resistance causing polyuria and hypernatremia. SIADH involves excess ADH causing water retention and dilutional hyponatremia." },
-        { ch: "ch2", topic: "THYROID DISORDERS", q: "What is the biochemical profile of Primary Hypothyroidism vs. Graves' Disease?", a: "Primary Hypothyroidism: High TSH, Low Free T3/T4. Graves' Disease (Hyperthyroidism): Suppressed (low) TSH, High Free T3/T4 with TSH-receptor antibodies." },
-        { ch: "ch2", topic: "ADRENAL CORTEX", q: "Differentiate Addison's Disease from Cushing's Syndrome.", a: "Addison's (adrenal insufficiency): low cortisol/aldosterone, hyperkalemia, hyponatremia, hyperpigmentation (high ACTH). Cushing's: excess cortisol, hyperglycemia, central obesity, hypertension." },
-        { ch: "ch2", topic: "CALCIUM HOMEOSTASIS", q: "How do Parathyroid Hormone (PTH) and Calcitonin regulate serum calcium?", a: "PTH increases serum Ca2+ via bone resorption, renal Ca2+ reabsorption, and calcitriol activation. Calcitonin lowers serum Ca2+ by inhibiting osteoclast activity." },
-        { ch: "ch2", topic: "ADRENAL MEDULLA", q: "What is Pheochromocytoma and what are its hallmark clinical signs?", a: "A catecholamine-secreting tumor of the adrenal medulla causing paroxysmal severe hypertension, headache, palpitations, and diaphoresis." },
-        { ch: "ch2", topic: "PANCREATIC PATHOLOGY", q: "Why does Diabetic Ketoacidosis (DKA) occur primarily in Type 1 Diabetes?", a: "Absolute insulin deficiency triggers unrestrained lipolysis, flooding the liver with free fatty acids converted into acidic ketone bodies (acetoacetate, beta-hydroxybutyrate)." }
+        <!-- Card B: Add Custom Practice Quiz Question -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-2">2. Add Custom Quiz Question (MCQ)</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="inputQzModule" class="block text-xs font-semibold text-slate-700 mb-1">Chapter / Module Name</label>
+              <input id="inputQzModule" type="text" value="Ch 2: Enzymes & Metabolism" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+            <div>
+              <label for="inputQzCorrect" class="block text-xs font-semibold text-slate-700 mb-1">Correct Option</label>
+              <select id="inputQzCorrect" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="0">Option A</option>
+                <option value="1">Option B</option>
+                <option value="2">Option C</option>
+                <option value="3">Option D</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="inputQzPrompt" class="block text-xs font-semibold text-slate-700 mb-1">Question Stem</label>
+            <input id="inputQzPrompt" type="text" placeholder="Type exam multiple-choice question..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input id="inputQzOpt0" type="text" placeholder="Option A..." class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs sm:text-sm" />
+            <input id="inputQzOpt1" type="text" placeholder="Option B..." class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs sm:text-sm" />
+            <input id="inputQzOpt2" type="text" placeholder="Option C..." class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs sm:text-sm" />
+            <input id="inputQzOpt3" type="text" placeholder="Option D..." class="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs sm:text-sm" />
+          </div>
+          <div>
+            <label for="inputQzExplanation" class="block text-xs font-semibold text-slate-700 mb-1">Answer Explanation</label>
+            <input id="inputQzExplanation" type="text" placeholder="Why is this option correct?" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
+          <button id="btnAddQuizQuestion" type="button" onclick="addCustomQuizFromForm()" class="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-teal-700 text-white hover:bg-teal-800 transition shadow-sm">
+            + Save Quiz Question to Module
+          </button>
+        </div>
+      </div>
+
+      <!-- Card C: One-Click JSON Study Pack Importer & Custom Items Manager -->
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">3. Fast Bulk Import (Paste JSON Study Pack from New PDFs)</h3>
+            <p class="text-xs text-slate-500">Whenever Jaana sends a new PDF, ask for a JSON Study Pack or paste it below to load an entire chapter's flashcards, quiz questions, and clinical cases at once.</p>
+          </div>
+          <button id="btnLoadSamplePack" type="button" onclick="loadSampleTemplateJson()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 self-start sm:self-auto">
+            Fill Sample Chapter Template
+          </button>
+        </div>
+
+        <textarea id="inputBulkJson" rows="4" placeholder='{"module": "Ch 2: Enzymes", "flashcards": [...], "quiz": [...], "cases": [...]}' class="w-full font-mono text-xs rounded-xl border border-slate-300 p-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <button id="btnImportJsonPack" type="button" onclick="importJsonStudyPack()" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm">
+            Import Study Pack into App
+          </button>
+          <span id="customItemsSummaryText" class="text-xs font-semibold text-slate-600">Custom items added: 0 cards, 0 quiz Qs, 0 cases</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-8">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+      <span>Prepared for <strong>NURB 1214 Biochemistry for Nursing</strong> (Assoc. Dr. Syamsul Ahmad Arifin, KON IIUM)</span>
+      <span>Keyboard Shortcuts: <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">Space</kbd> Flip · <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">&larr;</kbd> <kbd class="px-1.5 py-0.5 bg-slate-100 border rounded">&rarr;</kbd> Navigate</span>
+    </div>
+  </footer>
+
+  <script>
+    // =========================================================================
+    // 1. GROUNDED DATASET (100% from NURB 1214 Hormones 96-Slide Lecture PDF)
+    // =========================================================================
+
+    var FLASHCARDS = [
+      {
+        id: "fc1",
+        category: "Basics & Feedback",
+        slide: "Slide 2",
+        question: "How do Leptin and Ghrelin regulate hunger and satiety?",
+        answer: "Ghrelin ('hunger hormone') is secreted by the gut to stimulate appetite in the brain. Leptin ('satiety hormone') is secreted by adipose (fat) tissue to signal fullness to the brain.",
+        pearl: "Think 'G' for Ghrelin = Growling stomach (hungry); Leptin = Less appetite (full)."
+      },
+      {
+        id: "fc2",
+        category: "Basics & Feedback",
+        slide: "Slides 4–7",
+        question: "How does the Endocrine System differ from the Nervous System in speed, messengers, and transmission?",
+        answer: "The Nervous System is the 'Fast Network' using electrical impulses via neurons (CNS/PNS) for rapid responses. The Endocrine System is the 'Slow Current' using chemical hormones in the bloodstream (picograms/mL) for slower, longer-lasting systemic regulation.",
+        pearl: "The Hypothalamus acts as the 'Master Bridge' translating rapid electrical neural signals into endocrine hormone cascades."
+      },
+      {
+        id: "fc3",
+        category: "Basics & Feedback",
+        slide: "Slides 9–11",
+        question: "Explain Negative Feedback ('The Stabilizer') using the Thyroid Loop (HPT Axis).",
+        answer: "Hypothalamus releases TRH -> stimulates Anterior Pituitary to release TSH -> stimulates Thyroid gland to produce T3 and T4. As T3/T4 levels rise, they act as an 'inhibitory ceiling' (off-switch) that blocks further TRH and TSH release.",
+        pearl: "In primary hypothyroidism (low T3/T4), negative feedback is lost, causing pituitary TSH levels to rise high."
+      },
+      {
+        id: "fc4",
+        category: "Basics & Feedback",
+        slide: "Slides 12–13",
+        question: "Explain Positive Feedback ('The Amplifier') using Oxytocin in childbirth.",
+        answer: "Cervical stretching by the baby's head sends sensory nerve signals to the hypothalamus -> Posterior pituitary releases Oxytocin -> stimulates stronger uterine contractions -> pushes baby down for more cervical stretching until delivery.",
+        pearl: "Positive feedback escalates a change away from baseline to complete a necessary event (labour & postpartum uterine contraction)."
+      },
+      {
+        id: "fc5",
+        category: "Basics & Feedback",
+        slide: "Slides 38–45",
+        question: "What are the 3 mechanisms that trigger hormone release, with a clinical example of each?",
+        answer: "1. Humoral stimuli (blood fluid/ion change): Low blood Ca2+ triggers Parathyroid glands to release PTH.\n2. Hormonal stimuli (tropic hormone cascade): TRH -> TSH -> T3/T4.\n3. Neural stimuli (direct nerve signal): Sympathetic fibers stimulate the adrenal medulla to release epinephrine & norepinephrine.",
+        pearl: "Humoral comes from Latin 'humor' meaning body fluid (monitoring blood Ca2+ or blood glucose)."
+      },
+      {
+        id: "fc6",
+        category: "Classification & Transport",
+        slide: "Slides 16–17",
+        question: "Which hormones are Amino Acid Derivatives of Tyrosine vs. Tryptophan?",
+        answer: "From Tyrosine: Thyroid hormones (T3, T4 from thyroid gland) and Catecholamines (Epinephrine & Norepinephrine from adrenal medulla).\nFrom Tryptophan: Melatonin (pineal gland) and Serotonin (brain & other tissues).",
+        pearl: "Although both come from Tyrosine, catecholamines are water-soluble whereas thyroid hormones (T3/T4) are lipid-soluble!"
+      },
+      {
+        id: "fc7",
+        category: "Classification & Transport",
+        slide: "Slides 18–19",
+        question: "What are the key physical traits, receptor locations, and examples of Peptide Hormones?",
+        answer: "Short chains of amino acids (up to 50–100) that are water-soluble (hydrophilic / lipophobic). Because they cannot cross the lipid cell membrane, they bind to cell-surface receptors and trigger rapid second-messenger cascades. Examples: Insulin, Glucagon, ADH, Oxytocin, GH.",
+        pearl: "Peptide hormones travel unbound ('free') in blood plasma and have a very short half-life (minutes)."
+      },
+      {
+        id: "fc8",
+        category: "Classification & Transport",
+        slide: "Slides 20–21, 69",
+        question: "What are the key physical traits, mechanism of action, and examples of Steroid Hormones?",
+        answer: "Complex four-ring lipid structures derived entirely from cholesterol. They are lipid-soluble (hydrophobic), diffuse directly across plasma membranes, bind intracellular/nuclear receptors, and attach to DNA to activate mRNA transcription and protein synthesis. Examples: Cortisol, Aldosterone, Testosterone, Estrogen, Progesterone.",
+        pearl: "Steroid hormones do NOT use second messengers; their genetic action has a slow onset but long-lasting effect."
+      },
+      {
+        id: "fc9",
+        category: "Classification & Transport",
+        slide: "Slides 71–75",
+        question: "State the Fundamental Solubility Rule of Hormone Transport and its effect on half-life.",
+        answer: "Hydrophobic (lipid-soluble) hormones (Steroids + T3/T4) cannot dissolve in water-based plasma and REQUIRE carrier proteins, which shield them from breakdown and give them a LONG half-life. Hydrophilic (water-soluble) hormones (Peptides + Catecholamines) dissolve freely without carriers and have a SHORT half-life (minutes).",
+        pearl: "Without carrier globulins, lipid-soluble hormones would clump or be rapidly filtered out by the kidneys."
+      },
+      {
+        id: "fc10",
+        category: "Classification & Transport",
+        slide: "Slide 74",
+        question: "Name the 3 specific Binding Globulins ('The Carrier Fleet') and the hormones they transport.",
+        answer: "1. TBG (Thyroid-Binding Globulin) -> transports T3 and T4.\n2. CBG (Corticosteroid-Binding Globulin) -> transports Cortisol.\n3. SHBG (Sex-Hormone-Binding Globulin) -> transports Testosterone and Estrogen.",
+        pearl: "Carrier proteins act as shields in the bloodstream, dramatically extending plasma half-life."
+      },
+      {
+        id: "fc11",
+        category: "Receptors & Signaling",
+        slide: "Slides 48–49",
+        question: "What is the difference between a Ligand and a Hormone, and what are the 3 stages of Cell Signaling?",
+        answer: "A Ligand is the broad biochemical term for any molecule that binds specifically to a receptor; a Hormone is a specific endocrine ligand traveling via blood to distant target cells. The 3 stages of signaling are: 1. Reception -> 2. Transduction -> 3. Response.",
+        pearl: "A cell without matching receptors for a hormone is completely unaffected by that hormone."
+      },
+      {
+        id: "fc12",
+        category: "Receptors & Signaling",
+        slide: "Slides 51–52",
+        question: "What are the 3 common classes of Cell-Surface Receptors for water-soluble hormones?",
+        answer: "1. G Protein-Coupled Receptors (GPCR) — e.g., Epinephrine beta-adrenergic receptor, Glucagon receptor.\n2. Receptor Tyrosine Kinases (RTK) — e.g., Insulin receptor.\n3. Ligand-Gated Ion Channels (Ionotropic receptors).",
+        pearl: "Surface receptors act as 'gatekeepers' for hydrophilic molecules blocked by the phospholipid bilayer."
+      },
+      {
+        id: "fc13",
+        category: "Receptors & Signaling",
+        slide: "Slide 61",
+        question: "How does the G-Protein operate as a mechanical ON/OFF toggle switch?",
+        answer: "State 1 (ON): Hormone binds GPCR -> G-protein alpha-subunit drops GDP, binds GTP, and dissociates from beta/gamma subunits to activate the target enzyme.\nState 2 (OFF): The alpha-subunit's intrinsic GTPase hydrolyzes GTP back to GDP, re-forming the inactive trimer.",
+        pearl: "GDP = Inactive (Resting state); GTP = Active (Stimulated state)."
+      },
+      {
+        id: "fc14",
+        category: "Receptors & Signaling",
+        slide: "Slides 62–63",
+        question: "Trace the 6 steps of the Adenylyl Cyclase – cAMP Pathway and its fight-or-flight role.",
+        answer: "1. Hormone (e.g., Epinephrine) binds membrane GPCR -> 2. Activates Gs-protein -> 3. Gs activates Adenylyl Cyclase -> 4. Converts ATP into Cyclic AMP (cAMP, second messenger) -> 5. cAMP activates Protein Kinases -> 6. Kinases phosphorylate cellular proteins.",
+        pearl: "Phosphodiesterase breaks cAMP down into AMP. Clinically, epinephrine-cAMP increases heart rate, dilates muscle blood vessels, and breaks down glycogen."
+      },
+      {
+        id: "fc15",
+        category: "Receptors & Signaling",
+        slide: "Slides 64–66",
+        question: "How does the Phospholipase C (PLC) Pathway create a 'biochemical fork in the road'?",
+        answer: "Hormone binds GPCR -> G-protein activates Phospholipase C -> cleaves membrane lipid PIP2 into two second messengers:\n1. IP3 (dives into cytosol to release Ca2+ from ER; Ca2+ binds Calmodulin to activate cytosolic kinases).\n2. DAG (stays in membrane to activate Protein Kinase C / PKC, opening channels for extracellular Ca2+ entry).",
+        pearl: "Pulling additional Ca2+ from outside the cell via PKC allows sustained cellular responses even when ER Ca2+ stores empty."
+      },
+      {
+        id: "fc16",
+        category: "Hidden Network & GI",
+        slide: "Slides 27–30",
+        question: "Compare the 3 GI Command Matrix hormones: Gastrin, Secretin, and Cholecystokinin (CCK).",
+        answer: "• Gastrin (G-cells, stomach): Targets stomach to secrete HCl acid & aid motility.\n• Secretin (S-cells, small intestine): Triggered by acidic chyme; targets pancreas to release bicarbonate.\n• CCK (I-cells, small intestine): Triggered by fats/proteins; contracts gallbladder (bile), releases pancreatic enzymes, promotes brain satiety.",
+        pearl: "Memory aid: G-cells = Gastrin (gastric acid); S-cells = Secretin (sodium bicarbonate); I-cells = CCK (bile & enzymes)."
+      },
+      {
+        id: "fc17",
+        category: "Hidden Network & GI",
+        slide: "Slides 31–33",
+        question: "Compare ANP (Atrial Natriuretic Peptide) and EPO (Erythropoietin) in systemic homeostasis.",
+        answer: "• ANP: Secreted by heart atrial muscle cells when high blood volume stretches atrial walls -> tells kidneys to excrete Na+ and water (natriuresis), lowering BP and counteracting RAAS.\n• EPO: Secreted by kidneys (and liver) when systemic O2 drops -> stimulates bone marrow to produce red blood cells (erythropoiesis).",
+        pearl: "Heart = The Pump (releases ANP pressure-relief valve); Kidneys = The Filter (releases EPO oxygen thermostat)."
+      },
+      {
+        id: "fc18",
+        category: "Hidden Network & GI",
+        slide: "Slides 34–35",
+        question: "What are Incretins (GLP-1 & GIP) and how do Type 2 Diabetes drugs target them?",
+        answer: "GLP-1 (from intestinal L-cells) and GIP (from K-cells) are released after nutrient intake to boost insulin and suppress glucagon before blood glucose spikes. DPP-4 Inhibitors (Sitagliptin) block the DPP-4 enzyme that destroys natural GLP-1; GLP-1 Receptor Agonists (Liraglutide) are synthetic GLP-1 resistant to DPP-4.",
+        pearl: "DPP-4 is like 'molecular scissors' cutting up natural GLP-1; Sitagliptin shields the scissors, while Liraglutide is an unbreakable key."
+      },
+      {
+        id: "fc19",
+        category: "Hidden Network & GI",
+        slide: "Slides 36–37",
+        question: "What are Eicosanoids, what are they made from, and how far do they act?",
+        answer: "Eicosanoids (Prostaglandins, Leukotrienes, Thromboxanes) are lipid-derived tissue hormones synthesized from arachidonic acid in cell membranes. They act locally via Autocrine (self-targeting) and Paracrine (adjacent cells) signaling to mediate inflammation, pain, fever, clotting, and vessel/airway tone.",
+        pearl: "Unlike classical endocrine hormones that travel far in blood, eicosanoids have a tiny local 'blast radius'."
+      },
+      {
+        id: "fc20",
+        category: "Metabolism & Cases",
+        slide: "Slides 80–83",
+        question: "Contrast Insulin ('The Storage Blueprint') and Glucagon ('The Mobilization Blueprint').",
+        answer: "• Insulin: From pancreatic beta-cells; binds Tyrosine Receptor Kinase (RTK) -> phosphorylates IRSs -> moves GLUT4 vesicles to muscle/adipocyte membranes to clear blood glucose.\n• Glucagon: From pancreatic alpha-cells; binds Gs-coupled GPCR -> cAMP cascade -> stimulates liver glycogenolysis and gluconeogenesis to raise blood glucose.",
+        pearl: "Insulin stores glucose after meals; Glucagon (along with Epinephrine and Cortisol) mobilizes glucose during fasting or stress."
+      },
+      {
+        id: "fc21",
+        category: "Metabolism & Cases",
+        slide: "Slides 84–85",
+        question: "Match each endocrine axis to its Hyposecretion (Deficit) and Hypersecretion (Excess) disorder.",
+        answer: "• Thyroid (T3/T4): Deficit = Hashimoto Disease; Excess = Graves' Disease.\n• Cortisol & Aldosterone: Deficit = Addison's Disease; Excess = Cushing's Syndrome.\n• Growth Hormone: Excess = Gigantism (children) / Acromegaly (adults).\n• Insulin: Type 1 Diabetes = absolute deficiency; Type 2 Diabetes = systemic receptor resistance.",
+        pearl: "Addison's = Adrenal cortex deficit (low cortisol, low Na+, high K+, low BP, dark skin pigmentation)."
+      },
+      {
+        id: "fc22",
+        category: "Metabolism & Cases",
+        slide: "Slide 86",
+        question: "What lab tests belong to each panel on the Clinical Diagnostic Dashboard?",
+        answer: "• Endocrine (Thyroid): TSH, T4, T3.\n• Metabolic (Diabetes): Insulin, C-peptide, GLP-1.\n• Adrenal (Stress/BP): Cortisol, ACTH, Aldosterone.\n• Fluid Balance (Diabetes insipidus): ADH (Vasopressin).\n• Cardiac (Heart failure): Brain Natriuretic Peptide (BNP).\n• Reproductive: LH, FSH, Estrogen, Progesterone, Testosterone, hCG.",
+        pearl: "BNP tests for heart failure, while ADH tests for diabetes insipidus."
+      },
+      {
+        id: "fc23",
+        category: "Metabolism & Cases",
+        slide: "Slide 92 (Case 2)",
+        question: "Case 2 (Madam Chong, 65yo): Cold, tired, weight gain, slow HR, Low T3/T4 & High TSH. Explain the diagnosis, transport, and feedback loop.",
+        answer: "Affected gland: Thyroid gland (Primary Hypothyroidism / Hashimoto's) lacking T3 & T4. Transport: T3/T4 are hydrophobic and travel bound to TBG (Thyroid-Binding Globulin). Feedback loop: Low T3/T4 removes negative feedback inhibition on the hypothalamus/pituitary, driving TSH high.",
+        pearl: "Low T3/T4 + High TSH = Primary Thyroid gland failure."
+      },
+      {
+        id: "fc24",
+        category: "Metabolism & Cases",
+        slide: "Slides 94–95 (Cases 3 & 4)",
+        question: "Compare Cortisol (Case 3: Mr. Zul, Addison's) vs. ADH (Case 4: Puan Aida, Post-Pituitary Surgery) in class, receptor, and transport.",
+        answer: "• Cortisol (Case 3): Steroid hormone (lipid-soluble), binds intracellular/nuclear receptors, transported in blood by CBG (Corticosteroid-Binding Globulin).\n• ADH (Case 4): Peptide hormone (water-soluble), binds cell-surface GPCR receptors on kidney collecting ducts, uses cAMP second messenger, travels free in plasma.",
+        pearl: "Post-pituitary surgery causing 7L/day of dilute urine + high Na+ is classic Central Diabetes Insipidus (ADH deficiency)."
+      }
+    ];
+
+    var QUIZ_QUESTIONS = [
+      {
+        id: "q1",
+        category: "Classification & Transport",
+        slide: "Slide 17",
+        question: "Which pair of hormones is synthesized directly from the amino acid Tyrosine?",
+        options: [
+          "Melatonin and Serotonin",
+          "Thyroid hormones (T3/T4) and Catecholamines (Epinephrine/Norepinephrine)",
+          "Cortisol and Aldosterone",
+          "Insulin and Glucagon"
+        ],
+        correctIndex: 1,
+        explanation: "Tyrosine gives rise to Thyroid hormones (T3/T4) in the thyroid gland and Catecholamines (Epinephrine & Norepinephrine) in the adrenal medulla. Tryptophan is the precursor for Melatonin and Serotonin."
+      },
+      {
+        id: "q2",
+        category: "Classification & Transport",
+        slide: "Slides 72–75",
+        question: "Why do steroid and thyroid hormones have a much longer plasma half-life than peptide hormones?",
+        options: [
+          "They are water-soluble and resist kidney filtration on their own",
+          "They bind to specific plasma carrier globulins (TBG, CBG, SHBG) that shield them from rapid breakdown",
+          "They are stored inside red blood cells during transport",
+          "They are continuously synthesized by plasma enzymes in the bloodstream"
+        ],
+        correctIndex: 1,
+        explanation: "Hydrophobic (lipid-soluble) hormones bind to carrier proteins (TBG for T3/T4, CBG for Cortisol, SHBG for Testosterone/Estrogen), which protect them from rapid degradation and renal clearance."
+      },
+      {
+        id: "q3",
+        category: "Signaling & Receptors",
+        slide: "Slide 61",
+        question: "When a hormone binds to a G Protein-Coupled Receptor (GPCR), what triggers the G-protein to switch to its ACTIVE (ON) state?",
+        options: [
+          "The beta-subunit phosphorylates ATP into cAMP directly",
+          "The alpha-subunit drops GDP, binds GTP, and dissociates from the beta and gamma subunits",
+          "Intrinsic GTPase hydrolyzes GTP back into GDP",
+          "The entire receptor diffuses into the cell nucleus to bind DNA"
+        ],
+        correctIndex: 1,
+        explanation: "In the ON state, receptor binding causes the G-protein alpha-subunit to release GDP, bind GTP, and dissociate from the beta/gamma subunits to activate the next enzyme (such as adenylyl cyclase)."
+      },
+      {
+        id: "q4",
+        category: "Signaling & Receptors",
+        slide: "Slides 64–66",
+        question: "In the Phospholipase C (PLC) second-messenger pathway, which membrane lipid is cleaved, and what are the two resulting second messengers?",
+        options: [
+          "ATP is cleaved into cAMP and AMP",
+          "Cholesterol is cleaved into Cortisol and Aldosterone",
+          "PIP2 is cleaved into IP3 (which releases ER Ca2+) and DAG (which activates Protein Kinase C)",
+          "Arachidonic acid is cleaved into Prostaglandins and Thromboxanes"
+        ],
+        correctIndex: 2,
+        explanation: "Activated Phospholipase C hydrolyzes the membrane phospholipid PIP2 into IP3 (which travels to the ER to release Ca2+) and DAG (which stays in the membrane to activate PKC)."
+      },
+      {
+        id: "q5",
+        category: "GI & Non-Classical",
+        slide: "Slides 28–30",
+        question: "Acidic chyme entering the small intestine triggers which cells to release which hormone to neutralize the acid?",
+        options: [
+          "G-cells in the stomach to release Gastrin",
+          "S-cells in the small intestine to release Secretin, which stimulates pancreatic bicarbonate release",
+          "I-cells in the small intestine to release CCK, which stimulates gallbladder contraction",
+          "L-cells in the intestine to release GLP-1"
+        ],
+        correctIndex: 1,
+        explanation: "S-cells in the small intestine detect acidic chyme and release Secretin, which targets the pancreas to secrete bicarbonate and neutralize stomach acid."
+      },
+      {
+        id: "q6",
+        category: "GI & Non-Classical",
+        slide: "Slide 32",
+        question: "When high blood volume stretches the walls of the heart's atria, which hormone is released and what is its action?",
+        options: [
+          "EPO (Erythropoietin); stimulates bone marrow RBC production",
+          "Aldosterone; retains sodium and water in the kidneys",
+          "ANP (Atrial Natriuretic Peptide); acts on the kidneys to excrete sodium and water (natriuresis), lowering BP",
+          "ADH (Vasopressin); concentrates urine by reabsorbing free water"
+        ],
+        correctIndex: 2,
+        explanation: "ANP is secreted by cardiac muscle cells in the atria when stretched by high blood volume. It acts as a natural diuretic and vasodilator, excreting Na+ and H2O to lower blood pressure and counteracting RAAS."
+      },
+      {
+        id: "q7",
+        category: "GI & Non-Classical",
+        slide: "Slides 34–35",
+        question: "How do DPP-4 Inhibitors (e.g., Sitagliptin) help control blood glucose in Type 2 Diabetes?",
+        options: [
+          "They block the DPP-4 enzyme from breaking down the body's natural GLP-1 incretin hormone",
+          "They directly open GLUT4 channels on liver cells without needing insulin",
+          "They stimulate pancreatic alpha-cells to secrete more glucagon",
+          "They inhibit renal glucose reabsorption in the proximal tubule"
+        ],
+        correctIndex: 0,
+        explanation: "DPP-4 is the enzyme ('scissors') that rapidly degrades natural GLP-1. DPP-4 inhibitors like Sitagliptin block this enzyme, prolonging natural GLP-1's insulin-enhancing action after meals."
+      },
+      {
+        id: "q8",
+        category: "GI & Non-Classical",
+        slide: "Slides 36–37",
+        question: "Eicosanoids (Prostaglandins, Leukotrienes, Thromboxanes) are synthesized from which membrane precursor and act primarily via which signaling range?",
+        options: [
+          "Cholesterol; long-range endocrine signaling via binding globulins",
+          "Arachidonic acid; rapid localized autocrine and paracrine signaling",
+          "Tryptophan; synaptic neurotransmission in the CNS",
+          "Tyrosine; hypophyseal portal circulation"
+        ],
+        correctIndex: 1,
+        explanation: "Eicosanoids are lipid-derived tissue hormones synthesized from arachidonic acid in cell membranes. They mediate rapid, highly localized autocrine and paracrine reactions (inflammation, pain, fever, clotting)."
+      },
+      {
+        id: "q9",
+        category: "Metabolism & Clinical",
+        slide: "Slides 81 & 83",
+        question: "What is the receptor class and primary cellular action of Insulin on muscle cells and adipocytes?",
+        options: [
+          "GPCR (Gs-coupled); activates cAMP to break down glycogen",
+          "Intracellular nuclear receptor; binds DNA directly to synthesize glucose",
+          "Tyrosine Receptor Kinase (RTK); phosphorylates IRSs to translocate GLUT4 vesicles to the cell membrane",
+          "Ligand-gated ion channel; pumps sodium out of the cell"
+        ],
+        correctIndex: 2,
+        explanation: "Insulin binds a Tyrosine Receptor Kinase (RTK), triggering phosphorylation of Insulin-Receptor Substrates (IRSs) and moving GLUT4 glucose transporters to the cell membrane so glucose can enter muscle and fat cells."
+      },
+      {
+        id: "q10",
+        category: "Metabolism & Clinical",
+        slide: "Slide 85",
+        question: "Which pairing correctly matches an endocrine disorder with its hormone imbalance?",
+        options: [
+          "Hashimoto Disease — Hypersecretion (excess) of thyroid hormone",
+          "Addison's Disease — Hyposecretion (deficit) of cortisol and aldosterone",
+          "Cushing's Syndrome — Hyposecretion (deficit) of growth hormone",
+          "Graves' Disease — Hyposecretion (deficit) of cortisol"
+        ],
+        correctIndex: 1,
+        explanation: "Addison's Disease is caused by hyposecretion (deficit) of adrenal cortex hormones (cortisol and aldosterone), whereas Cushing's Syndrome is cortisol excess, Hashimoto's is thyroid deficit, and Graves' is thyroid excess."
+      },
+      {
+        id: "q11",
+        category: "Metabolism & Clinical",
+        slide: "Slide 88",
+        question: "A patient fasts for 12 hours before surgery yet maintains a normal blood glucose level. Which hormone and liver pathways are primarily responsible?",
+        options: [
+          "Insulin; glycolysis and lipogenesis",
+          "Glucagon; liver glycogenolysis (glycogen breakdown) and gluconeogenesis (making new glucose)",
+          "ADH; renal water reabsorption",
+          "Secretin; pancreatic bicarbonate secretion"
+        ],
+        correctIndex: 1,
+        explanation: "During fasting, pancreatic alpha-cells release Glucagon, which acts on the liver via GPCR/cAMP to stimulate glycogenolysis and gluconeogenesis, maintaining stable blood glucose."
+      },
+      {
+        id: "q12",
+        category: "Metabolism & Clinical",
+        slide: "Slide 91",
+        question: "During acute anaphylaxis, injected Epinephrine relaxes airway smooth muscle and raises heart rate within seconds via which mechanism?",
+        options: [
+          "Diffusing across the membrane into the nucleus to alter mRNA transcription",
+          "Binding a cell-surface beta-adrenergic GPCR, activating adenylate cyclase to produce cAMP",
+          "Binding TBG carrier proteins to enter bronchial cells",
+          "Cleaving cholesterol into prostaglandins"
+        ],
+        correctIndex: 1,
+        explanation: "Epinephrine is water-soluble and cannot cross the membrane. It binds a surface beta-adrenergic GPCR, activating adenylate cyclase to generate cAMP for a rapid intracellular cascade."
+      },
+      {
+        id: "q13",
+        category: "Metabolism & Clinical",
+        slide: "Slide 92 (Case 2: Madam Chong)",
+        question: "Madam Chong (65yo) has cold intolerance, weight gain, bradycardia, low T3/T4, and HIGH TSH. Why is her TSH elevated?",
+        options: [
+          "High TSH is caused by a positive feedback loop during thyroid hormone excess",
+          "Low T3/T4 levels remove negative feedback inhibition on the hypothalamus and anterior pituitary, causing the pituitary to secrete more TSH",
+          "TBG carrier proteins are converting T4 directly into TSH in the bloodstream",
+          "The adrenal cortex is secreting TSH in response to cold stress"
+        ],
+        correctIndex: 1,
+        explanation: "Normally, T3/T4 exert negative feedback ('inhibitory ceiling') on the hypothalamus and pituitary. When the thyroid gland fails and T3/T4 drop, negative feedback is lost, so the anterior pituitary releases high TSH."
+      },
+      {
+        id: "q14",
+        category: "Metabolism & Clinical",
+        slide: "Slide 94 (Case 3: Mr. Zul)",
+        question: "Mr. Zul (48yo) presents with Addison's Disease (BP 85/50, low Na+, high K+, low Cortisol). How is Cortisol classified, where is its receptor, and how is it transported?",
+        options: [
+          "Peptide hormone; cell-surface receptor; travels free in plasma",
+          "Steroid hormone; intracellular (cytoplasm/nuclear) receptor; transported bound to CBG (Corticosteroid-Binding Globulin)",
+          "Amino acid derivative; RTK receptor; transported bound to TBG",
+          "Glycoprotein hormone; ion channel receptor; transported bound to SHBG"
+        ],
+        correctIndex: 1,
+        explanation: "Cortisol is a lipid-soluble steroid hormone synthesized from cholesterol. It travels in blood bound to CBG, diffuses across the plasma membrane, and binds intracellular/nuclear receptors to regulate gene transcription."
+      },
+      {
+        id: "q15",
+        category: "Metabolism & Clinical",
+        slide: "Slide 95 (Case 4: Puan Aida)",
+        question: "Puan Aida (35yo) passes 7 litres/day of watery urine after pituitary surgery (ADH deficiency). What is ADH's chemical class, receptor location, and second messenger?",
+        options: [
+          "Steroid hormone; nuclear receptor; direct DNA transcription (no second messenger)",
+          "Peptide hormone; cell-surface receptor on kidney collecting ducts; acts via cAMP second messenger",
+          "Tyrosine derivative; intracellular receptor; acts via TBG",
+          "Eicosanoid; autocrine receptor; acts via arachidonic acid"
+        ],
+        correctIndex: 1,
+        explanation: "ADH (Vasopressin) is a water-soluble peptide hormone from the posterior pituitary. It binds cell-surface GPCRs on kidney collecting duct cells and activates the cAMP second-messenger pathway to insert water channels."
+      }
+    ];
+
+    var CLINICAL_CASES = [
+      {
+        id: "case2",
+        title: "Case 2: The Always Cold and Tired Patient (Madam Chong, 65yo)",
+        slide: "Slide 92 · Unanswered Exam Case",
+        disorder: "Primary Hypothyroidism (Hashimoto's Disease)",
+        scenario: "Madam Chong, 65 years old, came to the clinic complaining of tiredness, dry skin, and feeling cold most of the time. She also noticed some weight gain even though her appetite was poor. On assessment, her heart rate was slow, and her speech was sluggish. Her blood test showed low thyroid hormone levels and high TSH.",
+        vitals: ["Age: 65yo", "HR: Slow (Bradycardia)", "Symptoms: Cold, dry skin, weight gain", "Labs: Low T3/T4, High TSH"],
+        steps: [
+          {
+            q: "1. Clinical Question: Which gland is affected in this patient, and what hormone is lacking?",
+            a: "Affected Gland: The Thyroid gland (Primary Hypothyroidism, commonly Hashimoto's Disease).\nLacking Hormones: Thyroid hormones — T3 (triiodothyronine) and T4 (thyroxine), which normally drive basal metabolic rate, heat production, and sympathetic responsiveness."
+          },
+          {
+            q: "2. Molecular Question: How are T3 and T4 transported in the blood?",
+            a: "Because T3 and T4 are hydrophobic (lipid-soluble) tyrosine derivatives, they cannot dissolve freely in water-based blood plasma. They must bind to specific transport shuttle proteins—primarily TBG (Thyroid-Binding Globulin)—which also gives them a long plasma half-life."
+          },
+          {
+            q: "3. Molecular Question: What happens in the feedback loop between TSH and thyroid hormones when T3/T4 levels drop?",
+            a: "Loss of Negative Feedback Inhibition ('Inhibitory Ceiling'): Normally, adequate T3/T4 levels feed back to inhibit the Hypothalamus (blocking TRH) and Anterior Pituitary (blocking TSH). When T3/T4 drop low, this off-switch is removed, so the Anterior Pituitary secretes high levels of TSH in an attempt to stimulate the failing thyroid gland."
+          }
+        ]
+      },
+      {
+        id: "case3",
+        title: "Case 3: The Weak and Dehydrated Patient (Mr. Zul, 48yo)",
+        slide: "Slide 94 · Unanswered Exam Case",
+        disorder: "Addison's Disease (Adrenal Cortex Hyposecretion)",
+        scenario: "Mr. Zul, 48 years old, came to the emergency department feeling very weak, dizzy, and vomiting for two days. His blood pressure was 85/50 mmHg, and his skin looked darker around the elbows and face. Blood tests showed low sodium (hyponatremia), high potassium (hyperkalemia), and low cortisol.",
+        vitals: ["Age: 48yo", "BP: 85/50 mmHg (Hypotension)", "Signs: Dark skin pigmentation, vomiting", "Labs: Low Na+, High K+, Low Cortisol"],
+        steps: [
+          {
+            q: "1. What chemical classification of hormone is Cortisol?",
+            a: "Steroid Hormone (specifically a glucocorticoid synthesized entirely from cholesterol in the adrenal cortex). It is hydrophobic / lipid-soluble."
+          },
+          {
+            q: "2. Where is the receptor for Cortisol located, and how does it act?",
+            a: "Intracellular Receptor (located inside the cytoplasm or nucleus of the target cell). Because cortisol is lipid-soluble, it diffuses directly across the phospholipid membrane without needing a surface receptor or second messenger, forming a hormone-receptor complex that binds DNA as a transcription factor to alter mRNA and protein synthesis."
+          },
+          {
+            q: "3. How is Cortisol transported in the blood?",
+            a: "Bound to a specific plasma carrier globulin: CBG (Corticosteroid-Binding Globulin). This carrier protein keeps hydrophobic cortisol soluble in plasma and shields it from rapid renal clearance."
+          }
+        ]
+      },
+      {
+        id: "case4",
+        title: "Case 4: The Thirsty, Frequent Urinator (Puan Aida, 35yo)",
+        slide: "Slide 95 · Unanswered Exam Case",
+        disorder: "Central Diabetes Insipidus (Post-Pituitary Surgery ADH Deficit)",
+        scenario: "Puan Aida, 35 years old, had pituitary surgery last week. Since then, she has been drinking water constantly (polydipsia) and passing large amounts of urine—almost seven litres in one day (polyuria). Her urine is very clear and watery. Her blood sodium level is high (hypernatremia), and she feels dizzy when standing.",
+        vitals: ["Age: 35yo", "History: Pituitary surgery 1 week ago", "Urine Output: ~7 L/day (clear, watery)", "Labs: High plasma Na+, Orthostatic dizziness"],
+        steps: [
+          {
+            q: "1. What chemical classification of hormone is ADH (Antidiuretic Hormone / Vasopressin)?",
+            a: "Peptide Hormone (a short chain of amino acids synthesized in the hypothalamus and released by the posterior pituitary). It is hydrophilic (water-soluble / lipophobic) and travels unbound in blood with a very short half-life."
+          },
+          {
+            q: "2. Where is the receptor for ADH located?",
+            a: "On the Extracellular Surface (Plasma Membrane) of target cells (specifically V2 receptors on kidney collecting duct cells), because water-soluble peptide hormones cannot cross the lipid bilayer."
+          },
+          {
+            q: "3. Name the second messenger that ADH activates to concentrate urine.",
+            a: "Cyclic AMP (cAMP) (via a Gs-protein coupled receptor and adenylyl cyclase activation), which triggers protein kinases to insert Aquaporin-2 water channels into the kidney collecting duct membrane so water is reabsorbed back into the bloodstream. (Note: On vascular smooth muscle V1 receptors, ADH also uses IP3/DAG/Ca2+)."
+          }
+        ]
+      },
+      {
+        id: "scen1",
+        title: "Scenario 1: The 12-Hour Pre-Op Fasting Patient",
+        slide: "Slide 88 · Lecture Clinical Scenario",
+        disorder: "Fasting Glucose Homeostasis",
+        scenario: "A patient who has been fasting for 12 hours prior to a surgical procedure undergoes blood monitoring. Despite having no caloric intake, their blood glucose remains within a normal, stable range.",
+        vitals: ["State: 12-Hour Fasting", "Caloric Intake: None", "Blood Glucose: Normal & Stable"],
+        steps: [
+          {
+            q: "Which pancreatic hormone is primarily responsible for maintaining blood glucose during fasting, and what liver processes does it stimulate?",
+            a: "Hormone: Glucagon (secreted by pancreatic alpha-cells, acting via liver GPCR and cAMP).\nMetabolic Processes: It stimulates liver glycogenolysis (breakdown of stored glycogen into glucose) and gluconeogenesis (synthesis of new glucose from non-carbohydrate precursors) to release glucose into the bloodstream."
+          }
+        ]
+      },
+      {
+        id: "scen2",
+        title: "Scenario 2: Elevated Insulin with Persistent Hyperglycemia",
+        slide: "Slide 89 · Lecture Clinical Scenario",
+        disorder: "Type 2 Diabetes Mellitus (Insulin Resistance)",
+        scenario: "An adult patient with a BMI of 34 kg/m² presents with persistent polyuria and polydipsia. Laboratory testing reveals elevated circulating plasma insulin levels alongside high fasting blood glucose.",
+        vitals: ["BMI: 34 kg/m²", "Symptoms: Polyuria, Polydipsia", "Labs: High Plasma Insulin + High Fasting Glucose"],
+        steps: [
+          {
+            q: "Based on the target cell concept, why is the high level of circulating insulin failing to lower the patient's blood glucose?",
+            a: "Mechanism: The patient is experiencing Insulin Resistance (Type 2 Diabetes). Insulin is present in the blood, but the target cell Tyrosine Receptor Kinase (RTK) receptors fail to respond properly to insulin binding. This blocks downstream signal transduction (IRS phosphorylation) required to translocate GLUT4 glucose transporters to the cell membrane."
+          }
+        ]
+      },
+      {
+        id: "scen3",
+        title: "Scenario 3: Intravenous Hydrocortisone in Acute Inflammation",
+        slide: "Slide 90 · Lecture Clinical Scenario",
+        disorder: "Steroid Hormone Intracellular Signaling",
+        scenario: "A patient is prescribed intravenous Hydrocortisone (a steroid hormone / glucocorticoid) for an acute severe inflammatory response.",
+        vitals: ["Drug: IV Hydrocortisone (Cortisol)", "Class: Steroid / Glucocorticoid", "Indication: Severe Inflammation"],
+        steps: [
+          {
+            q: "Unlike peptide hormones that bind to cell surface receptors, how do steroid hormones like cortisol cross the cell membrane to alter cellular activity?",
+            a: "Mechanism: Because steroid hormones are lipid-derived (hydrophobic / lipophilic) molecules made from cholesterol, they diffuse directly through the phospholipid bilayer of the cell membrane and bind to intracellular/nuclear receptors to alter DNA gene expression and anti-inflammatory protein synthesis."
+          }
+        ]
+      },
+      {
+        id: "scen4",
+        title: "Scenario 4: Epinephrine in Acute Anaphylaxis",
+        slide: "Slide 91 · Lecture Clinical Scenario",
+        disorder: "Rapid GPCR – cAMP Second Messenger Cascade",
+        scenario: "During an acute anaphylactic reaction, a nurse administers Epinephrine to a patient. Within seconds, heart rate increases and airway smooth muscle relaxes.",
+        vitals: ["Condition: Acute Anaphylaxis", "Drug: Epinephrine (Adrenaline)", "Onset: Within seconds"],
+        steps: [
+          {
+            q: "Epinephrine cannot cross the cell membrane. What membrane-bound signal transduction component does it activate to rapidly initiate its intracellular effect?",
+            a: "Mechanism: Epinephrine binds to a cell-surface beta-adrenergic G-Protein Coupled Receptor (GPCR), which activates the enzyme adenylate (adenylyl) cyclase to convert ATP into the second messenger cyclic AMP (cAMP), triggering a rapid intracellular phosphorylation cascade."
+          }
+        ]
+      },
+      {
+        id: "scen5",
+        title: "Scenario 5: Post-Operative Stress Hyperglycemia",
+        slide: "Slide 93 · Lecture Clinical Scenario",
+        disorder: "Prolonged Stress Cortisol Response",
+        scenario: "A post-operative patient experiencing significant physiological stress and pain has sustained high blood glucose levels, despite having no history of diabetes.",
+        vitals: ["Context: Post-Op Pain & Stress", "History: Non-diabetic", "Finding: Sustained Hyperglycemia"],
+        steps: [
+          {
+            q: "Which hormone released from the adrenal cortex during sustained stress elevates blood glucose levels, and what metabolic pathway does it promote?",
+            a: "Hormone: Cortisol (released from the adrenal cortex under ACTH stimulation).\nMetabolic Pathway: It stimulates gluconeogenesis (the synthesis of new glucose from non-carbohydrate sources such as amino acids) in the liver to ensure an adequate fuel supply during prolonged physiological stress."
+          }
+        ]
+      }
+    ];
+
+    // Tag default Chapter 1 items with module = "Ch 1: Hormones (NURB 1214)"
+    for (var _fi = 0; _fi < FLASHCARDS.length; _fi++) {
+      FLASHCARDS[_fi].module = FLASHCARDS[_fi].module || "Ch 1: Hormones (NURB 1214)";
+    }
+    for (var _qi = 0; _qi < QUIZ_QUESTIONS.length; _qi++) {
+      QUIZ_QUESTIONS[_qi].module = QUIZ_QUESTIONS[_qi].module || "Ch 1: Hormones (NURB 1214)";
+    }
+    for (var _ci = 0; _ci < CLINICAL_CASES.length; _ci++) {
+      CLINICAL_CASES[_ci].module = CLINICAL_CASES[_ci].module || "Ch 1: Hormones (NURB 1214)";
+    }
+
+    // Built-in Chapter 2: Carbohydrates Metabolism I (60-slide deck by Assoc. Prof. Dr. Noratikah Othman)
+    var CH2_FLASHCARDS = [
+  {
+    "id": "ch2_fc1",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Basics & Feedback",
+    "slide": "Slides 4–5",
+    "question": "What is the structure of ATP, and why is it called a 'high-energy phosphate compound'?",
+    "answer": "ATP (adenosine triphosphate) consists of adenosine (adenine + ribose) attached to three phosphate groups. Removing one phosphate yields ADP; removing two yields AMP. Hydrolysis of each of the two terminal phosphate bonds releases a large standard free energy (ΔG° = -7.3 kcal/mol or -30.5 kJ/mol).",
+    "pearl": "ATP is the cell's 'chemical currency' because it directly couples energy-releasing (catabolic) and energy-requiring (anabolic) reactions."
+  },
+  {
+    "id": "ch2_fc2",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Basics & Feedback",
+    "slide": "Slides 6–9",
+    "question": "Compare Exergonic and Endergonic reactions, and explain how ATP drives coupled reactions.",
+    "answer": "• Exergonic reaction: Releases free energy (ΔG is negative, < 0) and occurs spontaneously (e.g., ATP hydrolysis: ΔG = -7.3 kcal/mol).\n• Endergonic reaction: Absorbs energy (ΔG is positive, > 0) and is non-spontaneous (e.g., Glutamate + NH3 -> Glutamine: ΔG = +3.4 kcal/mol).\nCoupling both gives a net negative ΔG (-3.9 kcal/mol), making the combined reaction favorable.",
+    "pearl": "Free energy changes (ΔG°) are additive: coupling Glucose + Pi -> G6P (+13.8 kJ/mol) with ATP hydrolysis (-30.5 kJ/mol) yields a net ΔG of -16.7 kJ/mol."
+  },
+  {
+    "id": "ch2_fc3",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Basics & Feedback",
+    "slide": "Slide 12",
+    "question": "What is the difference between Bioenergetics and Kinetics, and which organs can release free glucose from Glucose 6-Phosphate?",
+    "answer": "Bioenergetics concerns only the initial and final energy states to predict whether a reaction is possible, whereas Kinetics measures how fast the reaction occurs. The ONLY organs that can cleave glucose 6-phosphate to release free glucose into the blood are the liver and kidneys.",
+    "pearl": "Skeletal muscle lacks glucose-6-phosphatase, so muscle glycogen cannot be released directly as free blood glucose."
+  },
+  {
+    "id": "ch2_fc4",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Classification & Transport",
+    "slide": "Slides 13–16",
+    "question": "Define Oxidation and Reduction in biological redox reactions using Lactic Acid and Pyruvic Acid.",
+    "answer": "• Oxidation: Loss of electrons or removal of 2 hydrogen atoms (H+ + H-); the oxidized species is the reducing agent (e.g., Lactic acid -> Pyruvic acid).\n• Reduction: Gain of electrons or addition of 2H (H+ + H-); the reduced species is the oxidizing agent (e.g., Pyruvic acid -> Lactic acid).",
+    "pearl": "OIL RIG: Oxidation Is Loss of electrons/hydrogens; Reduction Is Gain of electrons/hydrogens."
+  },
+  {
+    "id": "ch2_fc5",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Classification & Transport",
+    "slide": "Slide 16",
+    "question": "Which two coenzymes carry hydrogen atoms in cellular redox reactions, and which B vitamins are they derived from?",
+    "answer": "1. NAD+ (Nicotinamide adenine dinucleotide): Derived from Vitamin B3 (niacin); reduced to NADH + H+.\n2. FAD (Flavin adenine dinucleotide): Derived from Vitamin B2 (riboflavin); reduced to FADH2.",
+    "pearl": "NAD+ = Niacin (B3); FAD = RiboFlavin (B2). Both shuttle high-energy electrons to the Electron Transport Chain."
+  },
+  {
+    "id": "ch2_fc6",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Classification & Transport",
+    "slide": "Slide 22",
+    "question": "How are dietary polysaccharides and disaccharides digested into monosaccharides?",
+    "answer": "Starch and glycogen are broken down by Amylase into disaccharides, which specific brush-border enzymes split into monosaccharides:\n• Maltose --(Maltase)--> 2 Glucose\n• Sucrose --(Sucrase)--> 1 Glucose + 1 Fructose\n• Lactose --(Lactase)--> 1 Glucose + 1 Galactose",
+    "pearl": "About 80% of all monosaccharides absorbed from carbohydrate digestion is glucose."
+  },
+  {
+    "id": "ch2_fc7",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Cases",
+    "slide": "Slides 23–25",
+    "question": "What is the normal blood glucose concentration, and what are the 4 metabolic fates of glucose?",
+    "answer": "Normal blood glucose is maintained at ~90 mg/100 mL (5 mmol/L; about 2–3 g total in circulating blood). Its 4 fates are:\n1. Immediate ATP production (oxidation)\n2. Amino acid synthesis\n3. Glycogen synthesis (glycogenesis: ~125 g in liver, ~375 g in skeletal muscle)\n4. Triglyceride synthesis (lipogenesis in liver -> stored in adipose tissue).",
+    "pearl": "Total body glycogen capacity is ~500 g (75% in skeletal muscle, 25% in liver); excess glucose beyond that is converted to fat via lipogenesis."
+  },
+  {
+    "id": "ch2_fc8",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Cases",
+    "slide": "Slides 27–28",
+    "question": "What are the diagnostic blood glucose and HbA1c cutoffs for Normal, Pre-diabetes (IFG/IGT), and Type 2 Diabetes Mellitus?",
+    "answer": "• Fasting Plasma Glucose: Normal < 6.1 mmol/L (4–6); IFG 6.1–6.9 mmol/L; Diabetes >= 7.0 mmol/L.\n• 2-Hour Post-Meal / OGTT: Normal < 7.8 mmol/L; IGT 7.8–11.0 mmol/L; Diabetes >= 11.1 mmol/L.\n• HbA1c: Normal < 5.6% (38 mmol/mol); Pre-diabetes 5.6–6.2% (38–44 mmol/mol); Diabetes >= 6.3% (45 mmol/mol).",
+    "pearl": "In asymptomatic patients, abnormal blood glucose tests must be repeated on another day to confirm Diabetes Mellitus."
+  },
+  {
+    "id": "ch2_fc9",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Receptors & Signaling",
+    "slide": "Slides 31–35",
+    "question": "What are the 4 stages of Glucose Catabolism (Cellular Respiration), and what happens in Glycolysis?",
+    "answer": "The 4 stages are: 1. Glycolysis -> 2. Formation of Acetyl CoA -> 3. Krebs Cycle -> 4. Electron Transport Chain (ETC).\nIn Glycolysis (10 reactions in the cytosol, anaerobic): 1 glucose (6C) splits into 2 pyruvic acid (3C). It invests 2 ATP and generates 4 ATP, giving a net gain of 2 ATP and 2 NADH + 2 H+.",
+    "pearl": "Phosphofructokinase (Step 3) commits fructose 6-phosphate to fructose 1,6-bisphosphate in glycolysis."
+  },
+  {
+    "id": "ch2_fc10",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Receptors & Signaling",
+    "slide": "Slides 36–37, 56",
+    "question": "What happens to Pyruvic Acid under anaerobic conditions, and how does the Cori Cycle work?",
+    "answer": "When oxygen is scarce (anaerobic), pyruvic acid is reduced by NADH + H+ into Lactic Acid (lactate), regenerating NAD+ so glycolysis can continue producing 2 ATP. In the Cori Cycle, lactate produced in exercising muscle travels via blood to the liver, which uses 6 ATP to convert lactate back into pyruvate and glucose.",
+    "pearl": "Anaerobic reduction of pyruvate to lactate is essential solely to regenerate NAD+ for Step 6 of glycolysis."
+  },
+  {
+    "id": "ch2_fc11",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Receptors & Signaling",
+    "slide": "Slides 38–39",
+    "question": "How is Pyruvic Acid converted into Acetyl Coenzyme A under aerobic conditions?",
+    "answer": "Pyruvic acid enters the mitochondrial matrix via a transporter protein. The enzyme Pyruvate Dehydrogenase removes 1 CO2 (decarboxylation) from each pyruvate, reduces NAD+ to NADH + H+, and attaches the remaining 2-carbon acetyl group to Coenzyme A to form Acetyl CoA.",
+    "pearl": "Per 1 molecule of glucose (2 pyruvates), the transition step produces 2 Acetyl CoA, 2 NADH + 2 H+, and releases 2 CO2."
+  },
+  {
+    "id": "ch2_fc12",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Hidden Network & GI",
+    "slide": "Slides 41–44",
+    "question": "Where does the Krebs Cycle occur, and what are its 8 intermediates and total yield per glucose molecule?",
+    "answer": "Occurs in the mitochondrial matrix. Acetyl CoA (2C) + Oxaloacetic acid (4C) -> 1. Citric acid (6C) -> 2. Isocitric acid -> 3. Alpha-ketoglutaric acid (+CO2, NADH) -> 4. Succinyl CoA (+CO2, NADH) -> 5. Succinic acid (+GTP -> ATP) -> 6. Fumaric acid (+FADH2) -> 7. Malic acid -> 8. Oxaloacetic acid (+NADH).\nPer 1 glucose (2 turns): 2 ATP (via GTP), 6 NADH, 2 FADH2, and 4 CO2.",
+    "pearl": "Mnemonic for Krebs intermediates: Citrate Is Krebs' Starting Substrate For Making Oxaloacetate."
+  },
+  {
+    "id": "ch2_fc13",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Hidden Network & GI",
+    "slide": "Slides 48–50",
+    "question": "How do the 3 Proton Pumps, Mobile Shuttles, and ATP Synthase work in the Electron Transport Chain (ETC)?",
+    "answer": "Located in the inner mitochondrial membrane:\n• Pump 1: NADH dehydrogenase complex (FMN & Fe-S) -> passes e- to mobile Coenzyme Q.\n• Pump 2: Cytochrome b-c1 complex -> passes e- to mobile Cytochrome c.\n• Pump 3: Cytochrome oxidase complex (cyt a, cyt a3, 2 Cu) -> passes e- to 1/2 O2 + 2H+ to form H2O.\nProtons (H+) pumped into the intermembrane space create the proton motive force that drives ATP synthase.",
+    "pearl": "Each NADH generates ~2.5 ATP (2–3 ATP), and each FADH2 generates ~1.5 ATP (1–2 ATP), giving a total of 36–38 ATP per glucose."
+  },
+  {
+    "id": "ch2_fc14",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Cases",
+    "slide": "Slides 52–57",
+    "question": "Compare Glycogenesis, Glycogenolysis, and Gluconeogenesis, including their key enzymes and hormones.",
+    "answer": "• Glycogenesis (Glucose -> G6P -> G1P -> UDP-glucose -> Glycogen): Uses Hexokinase & Glycogen Synthase; stimulated by Insulin.\n• Glycogenolysis (Glycogen -> G1P -> G6P -> Glucose): Uses Phosphorylase & Phosphatase (liver/kidney); stimulated by Glucagon & Epinephrine.\n• Gluconeogenesis (New glucose from lactate, glycerol, and ~60% of amino acids): Stimulated by Cortisol, Glucagon, and Thyroid hormones.",
+    "pearl": "Glycogenesis = storing sugar after meals (Insulin); Glycogenolysis & Gluconeogenesis = releasing/making sugar during fasting or stress."
+  }
+];
+    var CH2_QUIZ = [
+  {
+    "id": "ch2_q1",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Classification & Transport",
+    "slide": "Slides 5–6",
+    "question": "What is the standard free energy of hydrolysis (ΔG°) for each terminal phosphate bond of ATP, and what type of reaction is ATP hydrolysis?",
+    "options": [
+      "+7.3 kcal/mol (+30.5 kJ/mol); Endergonic and non-spontaneous",
+      "-7.3 kcal/mol (-30.5 kJ/mol); Exergonic and spontaneous",
+      "0 kcal/mol; Isoenergetic equilibrium",
+      "+13.8 kJ/mol; Anabolic phosphorylation"
     ],
-    quizzes: [
-        { ch: "ch1", q: "A patient has a mutation that prevents adenylyl cyclase activation. Which hormone's signaling pathway is most directly impaired?", options: ["Cortisol", "Glucagon", "Thyroxine (T4)", "Estrogen"], ans: 1, rationale: "Glucagon is a peptide hormone acting via Gs-coupled GPCRs that activate adenylyl cyclase to produce cAMP." },
-        { ch: "ch1", q: "Which hormone is synthesized from cholesterol and requires carrier proteins such as CBG or SHBG in circulation?", options: ["Insulin", "Epinephrine", "Cortisol", "Oxytocin"], ans: 2, rationale: "Cortisol is a steroid hormone derived from cholesterol; being hydrophobic, it binds corticosteroid-binding globulin (CBG)." },
-        { ch: "ch2", q: "A postoperative thyroidectomy patient develops positive Chvostek's and Trousseau's signs. Which biochemical abnormality explains this?", options: ["Hyperkalemia", "Hypocalcemia", "Hypernatremia", "Hypoglycemia"], ans: 1, rationale: "Accidental removal or ischemia of the parathyroid glands decreases PTH, leading to acute hypocalcemia and neuromuscular excitability." },
-        { ch: "ch2", q: "Lab results show TSH 0.02 mIU/L (low) and Free T4 4.8 ng/dL (high). Which clinical presentation matches these labs?", options: ["Bradycardia and weight gain", "Cold intolerance and dry skin", "Tachycardia, heat intolerance, and weight loss", "Hyperpigmentation and hypotension"], ans: 2, rationale: "Low TSH with elevated Free T4 indicates primary hyperthyroidism, increasing basal metabolic rate and sympathetic sensitivity." }
+    "correctIndex": 1,
+    "explanation": "Hydrolysis of each of the two terminal phosphate groups of ATP releases -7.3 kcal/mol (-30.5 kJ/mol). Because free energy is released (ΔG is negative), it is an exergonic reaction."
+  },
+  {
+    "id": "ch2_q2",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Classification & Transport",
+    "slide": "Slide 12",
+    "question": "Which are the ONLY two organs capable of releasing free glucose into the bloodstream from glucose 6-phosphate?",
+    "options": [
+      "Brain and Heart",
+      "Skeletal Muscle and Adipose Tissue",
+      "Liver and Kidneys",
+      "Pancreas and Spleen"
     ],
-    cases: [
-        {
-            ch: "ch1",
-            title: "Case 1 (Ch 1): Post-Prandial Hypoglycemia & GLUT4 Signaling",
-            scenario: "A 24-year-old nursing student eats a high-carbohydrate meal. Within 45 minutes, blood glucose rises and pancreatic beta-cells release insulin.",
-            question: "Which intracellular event allows skeletal muscle cells to rapidly clear glucose from the bloodstream?",
-            options: ["Activation of nuclear transcription factors", "Translocation of GLUT4 vesicles to the plasma membrane", "Inhibition of hexokinase", "Activation of glycogen phosphorylase"],
-            ans: 1,
-            rationale: "Insulin binding to its Receptor Tyrosine Kinase triggers PI3K/Akt signaling, causing intracellular GLUT4 vesicles to fuse with the cell membrane."
-        },
-        {
-            ch: "ch2",
-            title: "Case 2 (Ch 2): Acute Adrenal Crisis Management",
-            scenario: "A 38-year-old female with known Addison's disease presents to the ED with vomiting, BP 78/46 mmHg, Na+ 124 mEq/L, K+ 6.3 mEq/L, and glucose 54 mg/dL.",
-            question: "What is the immediate priority pharmacological intervention?",
-            options: ["IV Regular Insulin", "IV Hydrocortisone and 0.9% Normal Saline", "Oral Levothyroxine", "Subcutaneous Calcitonin"],
-            ans: 1,
-            rationale: "Adrenal crisis requires immediate IV glucocorticoid replacement (Hydrocortisone) and isotonic fluid resuscitation to correct shock and hypoglycemia."
-        }
+    "correctIndex": 2,
+    "explanation": "Only the liver and kidneys possess glucose-6-phosphatase, the enzyme required to remove the phosphate group from glucose 6-phosphate so free glucose can enter the blood."
+  },
+  {
+    "id": "ch2_q3",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Signaling & Receptors",
+    "slide": "Slides 15–16",
+    "question": "When pyruvic acid is converted into lactic acid by the addition of 2 hydrogen atoms (H+ + H-), what type of chemical reaction has occurred to pyruvic acid?",
+    "options": [
+      "Oxidation",
+      "Reduction",
+      "Decarboxylation",
+      "Hydrolysis"
+    ],
+    "correctIndex": 1,
+    "explanation": "Reduction is the addition of electrons/hydrogen atoms to a molecule, increasing its potential energy. Converting pyruvic acid to lactic acid by adding 2H is a classic reduction reaction."
+  },
+  {
+    "id": "ch2_q4",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "GI & Non-Classical",
+    "slide": "Slide 22",
+    "question": "During carbohydrate digestion, the disaccharide Lactose is hydrolyzed by Lactase into which monosaccharides?",
+    "options": [
+      "2 molecules of Glucose",
+      "1 Glucose + 1 Fructose",
+      "1 Glucose + 1 Galactose",
+      "1 Fructose + 1 Galactose"
+    ],
+    "correctIndex": 2,
+    "explanation": "Lactase splits lactose into 1 glucose + 1 galactose. (Maltase splits maltose into 2 glucose; Sucrase splits sucrose into 1 glucose + 1 fructose)."
+  },
+  {
+    "id": "ch2_q5",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Clinical",
+    "slide": "Slides 23 & 53",
+    "question": "Approximately how much total glycogen can the body store, and how is it distributed between skeletal muscle and the liver?",
+    "options": [
+      "500 g total: ~375 g (75%) in skeletal muscle and ~125 g (25%) in the liver",
+      "100 g total: 50 g in the brain and 50 g in adipose tissue",
+      "1000 g total: 900 g in the liver and 100 g in red blood cells",
+      "2–3 g total: stored entirely in blood plasma"
+    ],
+    "correctIndex": 0,
+    "explanation": "Total glycogen storage capacity is about 500 g (~1.1 lb): roughly 375 g (75%) in skeletal muscle fibers and 125 g (25%) in hepatocytes (liver cells), while only 2–3 g of free glucose circulates in blood."
+  },
+  {
+    "id": "ch2_q6",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Clinical",
+    "slide": "Slide 28",
+    "question": "According to the clinical diagnostic criteria for Type 2 Diabetes Mellitus, which set of values confirms a diagnosis of Diabetes?",
+    "options": [
+      "Fasting glucose < 6.1 mmol/L, 2-hour OGTT < 7.8 mmol/L, HbA1c < 5.6%",
+      "Fasting glucose 6.1–6.9 mmol/L, 2-hour OGTT 7.8–11.0 mmol/L, HbA1c 5.8%",
+      "Fasting glucose >= 7.0 mmol/L, Random/2-hour OGTT >= 11.1 mmol/L, or HbA1c >= 6.3% (45 mmol/mol)",
+      "Fasting glucose 4.5 mmol/L and HbA1c 5.0%"
+    ],
+    "correctIndex": 2,
+    "explanation": "Diabetes Mellitus is diagnosed at Fasting venous plasma glucose >= 7.0 mmol/L, Random or 2-hour OGTT >= 11.1 mmol/L, or HbA1c >= 6.3% (45 mmol/mol)."
+  },
+  {
+    "id": "ch2_q7",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Signaling & Receptors",
+    "slide": "Slides 33–35",
+    "question": "What is the NET gain of ATP and NADH from the glycolysis of one molecule of glucose in the cytosol?",
+    "options": [
+      "4 ATP and 4 NADH",
+      "2 ATP and 2 NADH (+ 2 H+)",
+      "36 ATP and 6 NADH",
+      "1 ATP and 1 FADH2"
+    ],
+    "correctIndex": 1,
+    "explanation": "Glycolysis consumes 2 ATP in the investment phase (Steps 1 & 3) and generates 4 ATP in the payoff phase (Steps 7–10), giving a net gain of 2 ATP, 2 NADH + 2 H+, and 2 pyruvic acid molecules."
+  },
+  {
+    "id": "ch2_q8",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Signaling & Receptors",
+    "slide": "Slides 36–37",
+    "question": "Why must pyruvic acid be converted into lactic acid when oxygen is scarce (anaerobic conditions)?",
+    "options": [
+      "To directly pump protons across the outer mitochondrial membrane",
+      "To regenerate NAD+ from NADH so that glycolysis (Step 6) can continue producing ATP anaerobically",
+      "To synthesize cholesterol in skeletal muscle",
+      "To release CO2 inside the cytosol"
+    ],
+    "correctIndex": 1,
+    "explanation": "Without oxygen, the electron transport chain stops oxidizing NADH. Reducing pyruvate to lactate oxidizes NADH back to NAD+, replenishing the NAD+ needed to keep glycolysis running."
+  },
+  {
+    "id": "ch2_q9",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "GI & Non-Classical",
+    "slide": "Slides 43–44",
+    "question": "In Step 5 of the Krebs Cycle, the conversion of Succinyl CoA to Succinic acid directly generates which high-energy compound via substrate-level phosphorylation?",
+    "options": [
+      "GTP (which donates a phosphate to ADP to form ATP)",
+      "FADH2",
+      "Acetyl CoA",
+      "Uridine diphosphate glucose (UDP-glucose)"
+    ],
+    "correctIndex": 0,
+    "explanation": "When CoA is displaced from Succinyl CoA to form Succinic acid, energy is captured via substrate-level phosphorylation to convert GDP into GTP, which then transfers its phosphate to ADP to make ATP."
+  },
+  {
+    "id": "ch2_q10",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "GI & Non-Classical",
+    "slide": "Slides 49–50",
+    "question": "In the Electron Transport Chain, which complex serves as the final (third) proton pump that transfers electrons directly to Oxygen (O2) to form H2O?",
+    "options": [
+      "NADH dehydrogenase complex (FMN and Fe-S)",
+      "Cytochrome b-c1 complex",
+      "Cytochrome oxidase complex (containing cytochromes a, a3, and two Copper atoms)",
+      "Pyruvate dehydrogenase complex"
+    ],
+    "correctIndex": 2,
+    "explanation": "The third proton pump is the Cytochrome oxidase complex (cyt a, cyt a3, and 2 Cu). Cyt a3 passes electrons to 1/2 O2, which picks up 2 H+ to form water (H2O)."
+  },
+  {
+    "id": "ch2_q11",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Clinical",
+    "slide": "Slides 46 & 50",
+    "question": "What is the theoretical maximum total ATP yield from the complete aerobic oxidation of one molecule of glucose, and which stage produces the majority of this ATP?",
+    "options": [
+      "2 ATP; produced mainly by Glycolysis",
+      "12 ATP; produced mainly by the Cori Cycle",
+      "36 to 38 ATP; produced mainly via Oxidative Phosphorylation (chemiosmosis / ATP synthase) in the Electron Transport Chain",
+      "100 ATP; produced mainly by Pyruvate Dehydrogenase"
+    ],
+    "correctIndex": 2,
+    "explanation": "Complete aerobic oxidation of 1 glucose yields 36–38 ATP total: 2 ATP from glycolysis, 2 ATP (via GTP) from the Krebs cycle, and 32–34 ATP from oxidative phosphorylation of NADH and FADH2 in the ETC."
+  },
+  {
+    "id": "ch2_q12",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "category": "Metabolism & Clinical",
+    "slide": "Slides 55–57",
+    "question": "Which non-carbohydrate precursors are used for Gluconeogenesis in the liver, and which hormones stimulate this pathway?",
+    "options": [
+      "Starch and cellulose; stimulated by Insulin and Leptin",
+      "Lactic acid, glycerol, and ~60% of amino acids; stimulated by Cortisol, Glucagon, and Thyroid hormones",
+      "Cholesterol and ketone bodies; stimulated by ADH and Oxytocin",
+      "Fructose and galactose; stimulated by Secretin"
+    ],
+    "correctIndex": 1,
+    "explanation": "Gluconeogenesis synthesizes glucose from lactic acid, glycerol (from triglycerides), and glucogenic amino acids (~60% of body amino acids), stimulated by cortisol, glucagon, and Thyroid hormones."
+  }
+];
+    var CH2_CASES = [
+  {
+    "id": "ch2_case1",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "title": "Case 1 (Carb): Interpreting OGTT & HbA1c Diagnostic Panels",
+    "slide": "Slides 27–28 · Clinical Diabetes Diagnosis",
+    "disorder": "Impaired Glucose Tolerance (Pre-Diabetes) vs. Type 2 Diabetes",
+    "scenario": "Two asymptomatic patients undergo screening at a clinic. Patient A has a Fasting Plasma Glucose of 6.4 mmol/L, a 2-hour OGTT of 9.2 mmol/L, and an HbA1c of 5.9%. Patient B has a Fasting Plasma Glucose of 7.8 mmol/L, a 2-hour OGTT of 12.4 mmol/L, and an HbA1c of 6.8%.",
+    "vitals": [
+      "Patient A: Fasting 6.4, 2h-OGTT 9.2, A1c 5.9%",
+      "Patient B: Fasting 7.8, 2h-OGTT 12.4, A1c 6.8%"
+    ],
+    "steps": [
+      {
+        "q": "1. How do you classify Patient A's glycemic status based on the lecture diagnostic tables?",
+        "a": "Pre-diabetes (both Impaired Fasting Glucose [IFG: 6.1–6.9 mmol/L] and Impaired Glucose Tolerance [IGT: 2-hour OGTT 7.8–11.0 mmol/L], with HbA1c in the 5.6–6.2% pre-diabetes range)."
+      },
+      {
+        "q": "2. How do you classify Patient B's status, and what nursing confirmation rule applies since Patient B is asymptomatic?",
+        "a": "Type 2 Diabetes Mellitus (Fasting >= 7.0 mmol/L, 2-hour OGTT >= 11.1 mmol/L, and HbA1c >= 6.3%). Because Patient B is asymptomatic, the blood test must be repeated on another day to confirm the diagnosis of Diabetes Mellitus."
+      }
     ]
-};
+  },
+  {
+    "id": "ch2_case2",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "title": "Case 2 (Carb): High-Intensity Exercise & The Cori Cycle",
+    "slide": "Slides 36–37 & 56 · Anaerobic Metabolism",
+    "disorder": "Anaerobic Glycolysis & Lactic Acid Shuttling",
+    "scenario": "During an intense sprint, a runner's skeletal muscles demand ATP faster than oxygen can be delivered by the bloodstream. Muscle pyruvic acid is rapidly converted into lactic acid, which enters the blood and travels to the liver.",
+    "vitals": [
+      "Muscle O2: Depleted (Anaerobic)",
+      "Muscle Output: 2 Lactate + 2 ATP",
+      "Liver Input: Lactate via Cori Cycle"
+    ],
+    "steps": [
+      {
+        "q": "1. Why do the runner's muscle cells reduce pyruvic acid into lactic acid when oxygen is scarce?",
+        "a": "To oxidize NADH + H+ back into NAD+. Without NAD+, Step 6 of glycolysis (oxidation of glyceraldehyde 3-phosphate) would halt, stopping anaerobic ATP production."
+      },
+      {
+        "q": "2. How does the liver handle the incoming lactate in the Cori Cycle, and what is the energy cost?",
+        "a": "In the liver, lactate is re-oxidized to pyruvate and converted back into glucose via gluconeogenesis (consuming 6 ATP in the liver). The newly formed glucose is released into the blood to return to the muscle."
+      }
+    ]
+  },
+  {
+    "id": "ch2_case3",
+    "module": "Ch 2: Carbohydrates Metabolism I",
+    "title": "Case 3 (Carb): Prolonged Fasting & Hepatic Glucose Mobilization",
+    "slide": "Slides 26, 54–57 · Glycogenolysis & Gluconeogenesis",
+    "disorder": "Fasting Glucose Homeostasis & Starvation Response",
+    "scenario": "A patient has been nil by mouth (NPO) for 24 hours. Initially, blood glucose is maintained at ~5 mmol/L (90 mg/100 mL) by breaking down liver glycogen (~125 g store). As liver glycogen becomes depleted, the body shifts to non-carbohydrate stores.",
+    "vitals": [
+      "Target Blood Glucose: ~5 mmol/L (90 mg/dL)",
+      "Liver Glycogen: ~125 g (Depleting)",
+      "Active Hormones: Glucagon & Cortisol"
+    ],
+    "steps": [
+      {
+        "q": "1. During the early hours of fasting, which enzyme and hormones trigger Glycogenolysis in hepatocytes, and why can't skeletal muscle glycogen (~375 g) directly restore blood glucose?",
+        "a": "Glucagon (from pancreatic alpha-cells) and Epinephrine activate Glycogen Phosphorylase to cleave glycogen into Glucose 1-phosphate -> Glucose 6-phosphate. Hepatocytes have Phosphatase (glucose-6-phosphatase) to release free glucose into blood, whereas skeletal muscle lacks this enzyme."
+      },
+      {
+        "q": "2. Once liver glycogen runs low, which pathway takes over, what are its 3 substrates, and which hormones drive it?",
+        "a": "Gluconeogenesis takes over in the liver, synthesizing new glucose from: 1. Lactic acid, 2. Glycerol (from adipose triglycerides), and 3. Amino acids (~60% of body amino acids from protein breakdown). It is driven by Cortisol, Glucagon, and Thyroid hormones."
+      }
+    ]
+  }
+];
 
-let state = {
-    chapter: 'all',
-    currentIndex: 0,
-    isFlipped: false,
-    mastered: new Set(),
-    quizScore: 0,
-    answeredQuizzes: new Set(),
-    customCards: JSON.parse(localStorage.getItem('nurb1214_custom') || '[]')
-};
+    FLASHCARDS = FLASHCARDS.concat(CH2_FLASHCARDS);
+    QUIZ_QUESTIONS = QUIZ_QUESTIONS.concat(CH2_QUIZ);
+    CLINICAL_CASES = CLINICAL_CASES.concat(CH2_CASES);
 
-function getFilteredCards() {
-    const all = [...defaultData.flashcards, ...state.customCards];
-    return state.chapter === 'all' ? all : all.filter(c => c.ch === state.chapter);
-}
+    // =========================================================================
+    // 2. APPLICATION STATE
+    // =========================================================================
+    var appState = {
+      activeTab: "flashcards",
+      activeModule: "ALL",
+      customFlashcards: [],
+      customQuiz: [],
+      customCases: [],
+      customNotes: [],
+      geminiApiKey: "", 
+      // Flashcards state
+      fcCategory: "All",
+      fcReviewOnly: false,
+      fcDeck: FLASHCARDS.slice(),
+      fcIndex: 0,
+      fcFlipped: false,
+      fcStatus: {}, // id -> 'mastered' | 'review'
+      // Quiz state
+      qzCategory: "All",
+      qzList: QUIZ_QUESTIONS.slice(),
+      qzIndex: 0,
+      qzAnswers: {}, // qId -> selectedOptionIndex
+      qzStreak: 0,
+      // Cases state
+      activeCaseId: "case2",
+      revealedCaseSteps: {} // "caseId_stepIdx" -> true
+    };
 
-function getFilteredQuizzes() {
-    return state.chapter === 'all' ? defaultData.quizzes : defaultData.quizzes.filter(q => q.ch === state.chapter);
-}
-
-function getFilteredCases() {
-    return state.chapter === 'all' ? defaultData.cases : defaultData.cases.filter(c => c.ch === state.chapter);
-}
-
-function renderAll() {
-    const cards = getFilteredCards();
-    const quizzes = getFilteredQuizzes();
-    const cases = getFilteredCases();
-
-    document.getElementById('fc-count').innerText = cards.length;
-    document.getElementById('qz-count').innerText = quizzes.length;
-    document.getElementById('cs-count').innerText = cases.length;
-    document.getElementById('stat-mastered').innerText = `${state.mastered.size} / ${cards.length}`;
-    document.getElementById('stat-quiz').innerText = `${state.quizScore} / ${quizzes.length}`;
-
-    // Render Flashcard
-    if (cards.length > 0) {
-        if (state.currentIndex >= cards.length) state.currentIndex = 0;
-        const card = cards[state.currentIndex];
-        document.getElementById('fc-topic').innerText = `${card.ch.toUpperCase()} • ${card.topic}`;
-        document.getElementById('fc-index').innerText = `Card ${state.currentIndex + 1} of ${cards.length}`;
-        document.getElementById('fc-side-label').innerText = state.isFlipped ? 'ANSWER / EXPLANATION' : 'QUESTION / CONCEPT';
-        document.getElementById('fc-text').innerText = state.isFlipped ? card.a : card.q;
+    function getAllFlashcards() {
+      var all = FLASHCARDS.concat(appState.customFlashcards || []);
+      if (appState.activeModule === "ALL") return all;
+      var out = [];
+      for (var i = 0; i < all.length; i++) {
+        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
+          out.push(all[i]);
+        }
+      }
+      return out;
     }
 
-    // Render Quiz
-    const qzContainer = document.getElementById('quiz-container');
-    qzContainer.innerHTML = quizzes.map((item, idx) => `
-        <div class="item-card">
-            <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.3rem;">${item.ch.toUpperCase()} • QUESTION ${idx + 1}</div>
-            <p><strong>${item.q}</strong></p>
-            <div>
-                ${item.options.map((opt, oIdx) => `
-                    <button class="option-btn" onclick="checkQuiz(${idx}, ${oIdx}, this)">${opt}</button>
-                `).join('')}
-            </div>
-            <div class="rationale" id="qz-rat-${idx}"><strong>Rationale:</strong> ${item.rationale}</div>
-        </div>
-    `).join('');
-
-    // Render Cases
-    const csContainer = document.getElementById('cases-container');
-    csContainer.innerHTML = cases.map((item, idx) => `
-        <div class="item-card">
-            <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.3rem;">${item.title}</div>
-            <p style="background:#f8fafc; padding:0.75rem; border-radius:6px; margin:0.5rem 0;">${item.scenario}</p>
-            <p><strong>${item.question}</strong></p>
-            <div>
-                ${item.options.map((opt, oIdx) => `
-                    <button class="option-btn" onclick="checkCase(${idx}, ${oIdx}, this)">${opt}</button>
-                `).join('')}
-            </div>
-            <div class="rationale" id="cs-rat-${idx}"><strong>Clinical Rationale:</strong> ${item.rationale}</div>
-        </div>
-    `).join('');
-}
-
-function flipCard() {
-    state.isFlipped = !state.isFlipped;
-    renderAll();
-}
-
-function nextCard() {
-    const cards = getFilteredCards();
-    state.currentIndex = (state.currentIndex + 1) % cards.length;
-    state.isFlipped = false;
-    renderAll();
-}
-
-function prevCard() {
-    const cards = getFilteredCards();
-    state.currentIndex = (state.currentIndex - 1 + cards.length) % cards.length;
-    state.isFlipped = false;
-    renderAll();
-}
-
-function markMastered() {
-    const cards = getFilteredCards();
-    if (cards[state.currentIndex]) {
-        state.mastered.add(cards[state.currentIndex].q);
-        nextCard();
+    function getAllQuizQuestions() {
+      var all = QUIZ_QUESTIONS.concat(appState.customQuiz || []);
+      if (appState.activeModule === "ALL") return all;
+      var out = [];
+      for (var i = 0; i < all.length; i++) {
+        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
+          out.push(all[i]);
+        }
+      }
+      return out;
     }
-}
 
-function checkQuiz(qIdx, oIdx, btn) {
-    const quizzes = getFilteredQuizzes();
-    const item = quizzes[qIdx];
-    const parent = btn.parentElement;
-    const buttons = parent.querySelectorAll('.option-btn');
-    buttons.forEach((b, i) => {
-        b.disabled = true;
-        if (i === item.ans) b.classList.add('correct');
-        else if (i === oIdx) b.classList.add('wrong');
+    function getAllCases() {
+      var all = CLINICAL_CASES.concat(appState.customCases || []);
+      if (appState.activeModule === "ALL") return all;
+      var out = [];
+      for (var i = 0; i < all.length; i++) {
+        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
+          out.push(all[i]);
+        }
+      }
+      return out.length > 0 ? out : all;
+    }
+
+    function loadSavedProgress() {
+      try {
+        var raw = localStorage.getItem("nurb1214_hormones_state_v1");
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            if (parsed.fcStatus) appState.fcStatus = parsed.fcStatus;
+            if (parsed.qzAnswers) appState.qzAnswers = parsed.qzAnswers;
+            if (parsed.revealedCaseSteps) appState.revealedCaseSteps = parsed.revealedCaseSteps;
+            if (typeof parsed.qzStreak === "number") appState.qzStreak = parsed.qzStreak;
+            if (Array.isArray(parsed.customFlashcards)) {
+              appState.customFlashcards = parsed.customFlashcards.filter(function(x) { return x && x.module !== "Ch 2: Enzymes & Bioenergetics"; });
+            }
+            if (Array.isArray(parsed.customQuiz)) {
+              appState.customQuiz = parsed.customQuiz.filter(function(x) { return x && x.module !== "Ch 2: Enzymes & Bioenergetics"; });
+            }
+            if (Array.isArray(parsed.customCases)) {
+              appState.customCases = parsed.customCases.filter(function(x) { return x && x.module !== "Ch 2: Enzymes & Bioenergetics"; });
+            }
+            if (Array.isArray(parsed.customNotes)) {
+              appState.customNotes = parsed.customNotes;
+            }
+            if (typeof parsed.geminiApiKey === "string") {
+              appState.geminiApiKey = parsed.geminiApiKey;
+              var keyInput = document.getElementById("inputOptionalGeminiKey");
+              if (keyInput) keyInput.value = parsed.geminiApiKey;
+            }
+          }
+        }
+      } catch (err) {
+        // Ignore storage errors in restricted environments
+      }
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem("nurb1214_hormones_state_v1", JSON.stringify({
+          fcStatus: appState.fcStatus,
+          qzAnswers: appState.qzAnswers,
+          revealedCaseSteps: appState.revealedCaseSteps,
+          qzStreak: appState.qzStreak,
+          customFlashcards: appState.customFlashcards,
+          customQuiz: appState.customQuiz,
+          customCases: appState.customCases,
+          customNotes: appState.customNotes,
+          geminiApiKey: appState.geminiApiKey
+        }));
+      } catch (err) {
+        // Ignore storage errors
+      }
+      refreshModuleDropdown();
+      updateTopScoreBar();
+    }
+
+    function refreshModuleDropdown() {
+      var selectEl = document.getElementById("moduleSelectDropdown");
+      if (!selectEl) return;
+      var modulesMap = { "Ch 1: Hormones (NURB 1214)": true, "Ch 2: Carbohydrates Metabolism I": true };
+      var allFc = FLASHCARDS.concat(appState.customFlashcards || []);
+      var allQz = QUIZ_QUESTIONS.concat(appState.customQuiz || []);
+      var allCs = CLINICAL_CASES.concat(appState.customCases || []);
+      for (var i = 0; i < allFc.length; i++) {
+        if (allFc[i].module) modulesMap[allFc[i].module] = true;
+      }
+      for (var j = 0; j < allQz.length; j++) {
+        if (allQz[j].module) modulesMap[allQz[j].module] = true;
+      }
+      for (var k = 0; k < allCs.length; k++) {
+        if (allCs[k].module) modulesMap[allCs[k].module] = true;
+      }
+      var htmlOpts = '<option value="ALL">All Chapters (Combined)</option>';
+      var keys = Object.keys(modulesMap);
+      for (var m = 0; m < keys.length; m++) {
+        var modName = keys[m];
+        var sel = (appState.activeModule === modName) ? ' selected="selected"' : '';
+        htmlOpts += '<option value="' + modName.replace(/"/g, '&quot;') + '"' + sel + '>' + modName + '</option>';
+      }
+      selectEl.innerHTML = htmlOpts;
+      if (appState.activeModule === "ALL") {
+        selectEl.value = "ALL";
+      }
+      var summaryEl = document.getElementById("customItemsSummaryText");
+      if (summaryEl) {
+        summaryEl.textContent = "Custom items added: " +
+          appState.customFlashcards.length + " cards, " +
+          appState.customQuiz.length + " quiz Qs, " +
+          appState.customCases.length + " cases";
+      }
+    }
+
+    function setActiveModule(modValue) {
+      appState.activeModule = modValue || "ALL";
+      appState.fcCategory = "All";
+      appState.qzCategory = "All";
+      rebuildFlashcardDeck();
+      setQuizCategory("All");
+      var casesList = getAllCases();
+      if (casesList.length > 0) {
+        appState.activeCaseId = casesList[0].id;
+      }
+      renderCasesView();
+      renderShortNotesView();
+      updateTopScoreBar();
+      showToast("Switched chapter view: " + (appState.activeModule === "ALL" ? "All Chapters" : appState.activeModule));
+    }
+
+    function showToast(msg) {
+      var banner = document.getElementById("toastBanner");
+      if (!banner) return;
+      banner.textContent = msg;
+      banner.classList.remove("hidden");
+      setTimeout(function () {
+        banner.classList.add("hidden");
+      }, 2600);
+    }
+
+    function updateTopScoreBar() {
+      var activeCards = getAllFlashcards();
+      var masteredCount = 0;
+      for (var i = 0; i < activeCards.length; i++) {
+        if (appState.fcStatus[activeCards[i].id] === "mastered") {
+          masteredCount++;
+        }
+      }
+      var activeQuiz = getAllQuizQuestions();
+      var correctQuiz = 0;
+      for (var j = 0; j < activeQuiz.length; j++) {
+        var q = activeQuiz[j];
+        if (appState.qzAnswers[q.id] === q.correctIndex) {
+          correctQuiz++;
+        }
+      }
+      var activeCases = getAllCases();
+      var solvedCases = 0;
+      for (var k = 0; k < activeCases.length; k++) {
+        var c = activeCases[k];
+        var allDone = true;
+        for (var s = 0; s < c.steps.length; s++) {
+          if (!appState.revealedCaseSteps[c.id + "_" + s]) {
+            allDone = false;
+            break;
+          }
+        }
+        if (allDone) solvedCases++;
+      }
+
+      document.getElementById("statMasteredCount").textContent = masteredCount + " / " + activeCards.length;
+      var progBar = document.getElementById("masteryProgressBar");
+      if (progBar) {
+        var totalItems = activeCards.length + activeQuiz.length + activeCases.length;
+        var doneItems = masteredCount + correctQuiz + solvedCases;
+        var pct = totalItems > 0 ? Math.max(4, Math.round((doneItems / totalItems) * 100)) : 4;
+        progBar.style.width = pct + "%";
+      }
+      document.getElementById("statQuizScore").textContent = correctQuiz + " / " + activeQuiz.length;
+      document.getElementById("statCasesSolved").textContent = solvedCases + " / " + activeCases.length;
+      document.getElementById("quizStreakBadge").textContent = "Streak: " + appState.qzStreak;
+      document.getElementById("tabBtnFlashcards").textContent = "Flashcards (" + activeCards.length + ")";
+      document.getElementById("tabBtnQuiz").textContent = "Practice Quiz (" + activeQuiz.length + ")";
+      document.getElementById("tabBtnCases").textContent = "Clinical Cases (" + activeCases.length + ")";
+      var allFcBtn = document.querySelector('.fc-cat-btn[data-fc-cat="All"]');
+      if (allFcBtn) allFcBtn.textContent = "All (" + activeCards.length + ")";
+      var allQzBtn = document.querySelector('.qz-cat-btn[data-qz-cat="All"]');
+      if (allQzBtn) allQzBtn.textContent = "All Questions (" + activeQuiz.length + ")";
+    }
+
+    // =========================================================================
+    // 3. TAB NAVIGATION
+    // =========================================================================
+    function switchTab(tabName) {
+      appState.activeTab = tabName;
+      var views = {
+        notes: document.getElementById("viewNotes"),
+        flashcards: document.getElementById("viewFlashcards"),
+        quiz: document.getElementById("viewQuiz"),
+        cases: document.getElementById("viewCases"),
+        manage: document.getElementById("viewManage")
+      };
+      var btns = {
+        notes: document.getElementById("tabBtnNotes"),
+        flashcards: document.getElementById("tabBtnFlashcards"),
+        quiz: document.getElementById("tabBtnQuiz"),
+        cases: document.getElementById("tabBtnCases"),
+        manage: document.getElementById("tabBtnManage")
+      };
+
+      for (var key in views) {
+        if (key === tabName) {
+          views[key].classList.remove("hidden");
+          btns[key].className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-teal-600 text-white shadow";
+        } else {
+          views[key].classList.add("hidden");
+          btns[key].className = (key === "manage")
+            ? "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-amber-300 hover:text-white"
+            : "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-200 hover:text-white";
+        }
+      }
+    }
+
+    // =========================================================================
+    // 4. FLASHCARDS CONTROLLER
+    // =========================================================================
+    function rebuildFlashcardDeck() {
+      var sourceCards = getAllFlashcards();
+      var filtered = [];
+      for (var i = 0; i < sourceCards.length; i++) {
+        var card = sourceCards[i];
+        var catMatch = (appState.fcCategory === "All") || (card.category === appState.fcCategory);
+        var revMatch = !appState.fcReviewOnly || (appState.fcStatus[card.id] === "review");
+        if (catMatch && revMatch) {
+          filtered.push(card);
+        }
+      }
+      if (filtered.length === 0) {
+        appState.fcReviewOnly = false;
+        document.getElementById("btnToggleReviewFilter").textContent = "Show Review Only: OFF";
+        for (var j = 0; j < sourceCards.length; j++) {
+          if (appState.fcCategory === "All" || sourceCards[j].category === appState.fcCategory) {
+            filtered.push(sourceCards[j]);
+          }
+        }
+        if (filtered.length === 0) {
+          filtered = sourceCards.slice();
+        }
+      }
+      appState.fcDeck = filtered;
+      appState.fcIndex = 0;
+      appState.fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function setFlashcardCategory(cat) {
+      appState.fcCategory = cat;
+      var buttons = document.querySelectorAll(".fc-cat-btn");
+      for (var i = 0; i < buttons.length; i++) {
+        var b = buttons[i];
+        if (b.getAttribute("data-fc-cat") === cat) {
+          b.className = "fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white";
+        } else {
+          b.className = "fc-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200";
+        }
+      }
+      rebuildFlashcardDeck();
+    }
+
+    function toggleReviewOnlyFilter() {
+      appState.fcReviewOnly = !appState.fcReviewOnly;
+      var btn = document.getElementById("btnToggleReviewFilter");
+      btn.textContent = appState.fcReviewOnly ? "Show Review Only: ON" : "Show Review Only: OFF";
+      rebuildFlashcardDeck();
+    }
+
+    function shuffleFlashcards() {
+      var arr = appState.fcDeck.slice();
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+      }
+      appState.fcDeck = arr;
+      appState.fcIndex = 0;
+      appState.fcFlipped = false;
+      renderFlashcard();
+      showToast("Flashcard deck shuffled!");
+    }
+
+    function flipCurrentCard() {
+      appState.fcFlipped = !appState.fcFlipped;
+      var inner = document.getElementById("fcInner");
+      if (appState.fcFlipped) {
+        inner.classList.add("is-flipped");
+      } else {
+        inner.classList.remove("is-flipped");
+      }
+    }
+
+    function navigateFlashcard(delta) {
+      if (appState.fcDeck.length === 0) return;
+      appState.fcIndex = (appState.fcIndex + delta + appState.fcDeck.length) % appState.fcDeck.length;
+      appState.fcFlipped = false;
+      renderFlashcard();
+    }
+
+    function markCardStatus(status) {
+      if (appState.fcDeck.length === 0) return;
+      var current = appState.fcDeck[appState.fcIndex];
+      appState.fcStatus[current.id] = status;
+      saveProgress();
+      renderFlashcard();
+      showToast(status === "mastered" ? "Marked as Mastered!" : "Added to Needs Review!");
+      if (appState.fcDeck.length > 1) {
+        setTimeout(function () {
+          navigateFlashcard(1);
+        }, 280);
+      }
+    }
+
+    function renderFlashcard() {
+      var inner = document.getElementById("fcInner");
+      inner.classList.remove("is-flipped");
+      appState.fcFlipped = false;
+
+      var card = appState.fcDeck[appState.fcIndex];
+      if (!card) return;
+
+      document.getElementById("fcCategoryBadge").textContent = card.category;
+      document.getElementById("fcCounterText").textContent = "Card " + (appState.fcIndex + 1) + " of " + appState.fcDeck.length;
+      document.getElementById("fcSlideTagFront").textContent = card.slide;
+      document.getElementById("fcSlideTagBack").textContent = card.slide;
+      document.getElementById("fcQuestionText").textContent = card.question;
+      document.getElementById("fcAnswerText").textContent = card.answer;
+      document.getElementById("fcPearlText").textContent = card.pearl;
+
+      var st = appState.fcStatus[card.id];
+      var statusBadge = document.getElementById("fcStatusBadgeFront");
+      if (st === "mastered") {
+        statusBadge.textContent = "Mastered";
+        statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+      } else if (st === "review") {
+        statusBadge.textContent = "Needs Review";
+        statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800";
+      } else {
+        statusBadge.textContent = "Not Rated";
+        statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600";
+      }
+    }
+
+    // =========================================================================
+    // 5. PRACTICE QUIZ CONTROLLER
+    // =========================================================================
+    function setQuizCategory(cat) {
+      appState.qzCategory = cat;
+      var buttons = document.querySelectorAll(".qz-cat-btn");
+      for (var i = 0; i < buttons.length; i++) {
+        var b = buttons[i];
+        if (b.getAttribute("data-qz-cat") === cat) {
+          b.className = "qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white";
+        } else {
+          b.className = "qz-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200";
+        }
+      }
+
+      var sourceQuiz = getAllQuizQuestions();
+      var filtered = [];
+      for (var j = 0; j < sourceQuiz.length; j++) {
+        if (cat === "All" || sourceQuiz[j].category === cat) {
+          filtered.push(sourceQuiz[j]);
+        }
+      }
+      if (filtered.length === 0) {
+        filtered = sourceQuiz.slice();
+      }
+      appState.qzList = filtered;
+      appState.qzIndex = 0;
+      renderQuizQuestion();
+    }
+
+    function jumpToQuizQuestion(idx) {
+      if (idx >= 0 && idx < appState.qzList.length) {
+        appState.qzIndex = idx;
+        renderQuizQuestion();
+      }
+    }
+
+    function navigateQuiz(delta) {
+      if (appState.qzList.length === 0) return;
+      appState.qzIndex = (appState.qzIndex + delta + appState.qzList.length) % appState.qzList.length;
+      renderQuizQuestion();
+    }
+
+    function selectQuizOption(optIdx) {
+      var q = appState.qzList[appState.qzIndex];
+      if (!q) return;
+      appState.qzAnswers[q.id] = optIdx;
+      if (optIdx === q.correctIndex) {
+        appState.qzStreak++;
+      } else {
+        appState.qzStreak = 0;
+      }
+      saveProgress();
+      renderQuizQuestion();
+    }
+
+    function resetQuiz() {
+      appState.qzAnswers = {};
+      appState.qzStreak = 0;
+      appState.qzIndex = 0;
+      saveProgress();
+      renderQuizQuestion();
+      showToast("Quiz reset! Ready for a fresh run.");
+    }
+
+    function renderQuizQuestion() {
+      var q = appState.qzList[appState.qzIndex];
+      if (!q) return;
+
+      document.getElementById("qzTopicLabel").textContent = q.category;
+      document.getElementById("qzProgressLabel").textContent = "Question " + (appState.qzIndex + 1) + " of " + appState.qzList.length + " · " + q.slide;
+      document.getElementById("qzQuestionPrompt").textContent = q.question;
+
+      // Render progress dots
+      var dotsHtml = "";
+      for (var d = 0; d < appState.qzList.length; d++) {
+        var item = appState.qzList[d];
+        var ans = appState.qzAnswers[item.id];
+        var dotStyle = "bg-white text-slate-600 border-slate-300";
+        if (typeof ans === "number") {
+          dotStyle = (ans === item.correctIndex)
+            ? "bg-emerald-600 text-white border-emerald-600"
+            : "bg-rose-600 text-white border-rose-600";
+        }
+        if (d === appState.qzIndex) {
+          dotStyle += " ring-2 ring-teal-500 ring-offset-1";
+        }
+        dotsHtml += '<button type="button" onclick="jumpToQuizQuestion(' + d + ')" class="w-7 h-7 rounded-lg text-xs font-bold border transition ' + dotStyle + '">' + (d + 1) + '</button>';
+      }
+      document.getElementById("quizDotsContainer").innerHTML = dotsHtml;
+
+      // Render options
+      var chosen = appState.qzAnswers[q.id];
+      var hasAnswered = (typeof chosen === "number");
+      var optsHtml = "";
+      var letters = ["A", "B", "C", "D"];
+
+      for (var i = 0; i < q.options.length; i++) {
+        var btnClass = "w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm font-medium transition flex items-start gap-3 ";
+        var badgeClass = "w-6 h-6 rounded-md text-xs font-bold flex items-center justify-center shrink-0 ";
+
+        if (!hasAnswered) {
+          btnClass += "bg-slate-50 hover:bg-teal-50/70 border-slate-200 hover:border-teal-400 text-slate-800";
+          badgeClass += "bg-white border border-slate-300 text-slate-700";
+        } else if (i === q.correctIndex) {
+          btnClass += "bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold";
+          badgeClass += "bg-emerald-600 text-white";
+        } else if (i === chosen && i !== q.correctIndex) {
+          btnClass += "bg-rose-50 border-rose-400 text-rose-950";
+          badgeClass += "bg-rose-600 text-white";
+        } else {
+          btnClass += "bg-white border-slate-200 text-slate-400 opacity-75";
+          badgeClass += "bg-slate-100 text-slate-400";
+        }
+
+        optsHtml += '<button type="button" onclick="selectQuizOption(' + i + ')" class="' + btnClass + '">' +
+          '<span class="' + badgeClass + '">' + letters[i] + '</span>' +
+          '<span class="pt-0.5">' + q.options[i] + '</span>' +
+          '</button>';
+      }
+      document.getElementById("qzOptionsList").innerHTML = optsHtml;
+
+      var expBox = document.getElementById("qzExplanationBox");
+      var expHeader = document.getElementById("qzFeedbackHeader");
+      var expText = document.getElementById("qzExplanationText");
+
+      if (hasAnswered) {
+        expBox.classList.remove("hidden");
+        if (chosen === q.correctIndex) {
+          expBox.className = "rounded-xl p-4 border bg-emerald-50/70 border-emerald-300 text-xs sm:text-sm space-y-1";
+          expHeader.className = "font-bold text-sm text-emerald-800";
+          expHeader.textContent = "Correct! Great job.";
+        } else {
+          expBox.className = "rounded-xl p-4 border bg-rose-50/70 border-rose-300 text-xs sm:text-sm space-y-1";
+          expHeader.className = "font-bold text-sm text-rose-800";
+          expHeader.textContent = "Not quite — Answer " + letters[q.correctIndex] + " is correct.";
+        }
+        expText.textContent = q.explanation;
+      } else {
+        expBox.classList.add("hidden");
+      }
+    }
+
+    // =========================================================================
+    // 6. CLINICAL CASE SIMULATOR CONTROLLER
+    // =========================================================================
+    function selectCase(caseId) {
+      appState.activeCaseId = caseId;
+      renderCasesView();
+    }
+
+    function toggleCaseStep(caseId, stepIdx) {
+      var key = caseId + "_" + stepIdx;
+      appState.revealedCaseSteps[key] = !appState.revealedCaseSteps[key];
+      saveProgress();
+      renderCasesView();
+    }
+
+    function revealAllCurrentCaseSteps() {
+      var allCases = getAllCases();
+      var currentCase = null;
+      for (var i = 0; i < allCases.length; i++) {
+        if (allCases[i].id === appState.activeCaseId) {
+          currentCase = allCases[i];
+          break;
+        }
+      }
+      if (!currentCase) return;
+      for (var s = 0; s < currentCase.steps.length; s++) {
+        appState.revealedCaseSteps[currentCase.id + "_" + s] = true;
+      }
+      saveProgress();
+      renderCasesView();
+      showToast("All model answers revealed for this case!");
+    }
+
+    function renderCasesView() {
+      var allCases = getAllCases();
+      var selectorHtml = "";
+      var activeCase = allCases[0];
+
+      for (var i = 0; i < allCases.length; i++) {
+        var c = allCases[i];
+        if (c.id === appState.activeCaseId) {
+          activeCase = c;
+        }
+        var isActive = (c.id === appState.activeCaseId);
+        var shortLabel = c.id.indexOf("case") === 0
+          ? c.title.split(":")[0] + " (" + c.title.split("(")[1]
+          : c.title.split(":")[0];
+        var btnStyle = isActive
+          ? "bg-teal-700 text-white border-teal-700 shadow-sm"
+          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100";
+        selectorHtml += '<button type="button" onclick="selectCase(\'' + c.id + '\')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition ' + btnStyle + '">' + shortLabel + '</button>';
+      }
+      document.getElementById("caseSelectorBar").innerHTML = selectorHtml;
+
+      document.getElementById("caseBadgeSlide").textContent = activeCase.slide;
+      document.getElementById("caseBadgeDisorder").textContent = activeCase.disorder;
+      document.getElementById("caseTitle").textContent = activeCase.title;
+      document.getElementById("caseScenarioText").textContent = activeCase.scenario;
+
+      var vitalsHtml = "";
+      for (var v = 0; v < activeCase.vitals.length; v++) {
+        vitalsHtml += '<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-teal-200 border border-slate-700">' + activeCase.vitals[v] + '</span>';
+      }
+      document.getElementById("caseVitalsRow").innerHTML = vitalsHtml;
+
+      var stepsHtml = "";
+      for (var s = 0; s < activeCase.steps.length; s++) {
+        var stepObj = activeCase.steps[s];
+        var key = activeCase.id + "_" + s;
+        var isRevealed = Boolean(appState.revealedCaseSteps[key]);
+
+        stepsHtml += '<div class="border border-slate-200 rounded-xl p-4 bg-slate-50/60 space-y-3">' +
+          '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">' +
+            '<h4 class="text-sm font-bold text-slate-900">' + stepObj.q + '</h4>' +
+            '<button type="button" onclick="toggleCaseStep(\'' + activeCase.id + '\', ' + s + ')" class="px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 self-start sm:self-auto transition ' +
+              (isRevealed ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-teal-700 text-white hover:bg-teal-800') + '">' +
+              (isRevealed ? 'Hide Model Answer' : 'Show Model Answer') +
+            '</button>' +
+          '</div>' +
+          (isRevealed
+            ? '<div class="p-3.5 rounded-lg bg-white border border-teal-200 text-xs sm:text-sm text-slate-800 whitespace-pre-line leading-relaxed">' + stepObj.a + '</div>'
+            : '<p class="text-xs text-slate-500 italic">Think of your answer first, then tap "Show Model Answer" to check.</p>') +
+        '</div>';
+      }
+      document.getElementById("caseStepsContainer").innerHTML = stepsHtml;
+    }
+
+    // =========================================================================
+    // 7. RESET & KEYBOARD SHORTCUTS
+    // =========================================================================
+    function resetAllProgress() {
+      appState.fcStatus = {};
+      appState.qzAnswers = {};
+      appState.revealedCaseSteps = {};
+      appState.qzStreak = 0;
+      saveProgress();
+      renderFlashcard();
+      renderQuizQuestion();
+      renderCasesView();
+      showToast("All study progress has been reset.");
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+      if (appState.activeTab === "flashcards") {
+        if (e.code === "Space") {
+          e.preventDefault();
+          flipCurrentCard();
+        } else if (e.code === "ArrowRight") {
+          e.preventDefault();
+          navigateFlashcard(1);
+        } else if (e.code === "ArrowLeft") {
+          e.preventDefault();
+          navigateFlashcard(-1);
+        }
+      } else if (appState.activeTab === "quiz") {
+        if (e.code === "ArrowRight") {
+          e.preventDefault();
+          navigateQuiz(1);
+        } else if (e.code === "ArrowLeft") {
+          e.preventDefault();
+          navigateQuiz(-1);
+        }
+      }
     });
-    if (oIdx === item.ans && !state.answeredQuizzes.has(item.q)) {
-        state.quizScore++;
-        state.answeredQuizzes.add(item.q);
-        document.getElementById('stat-quiz').innerText = `${state.quizScore} / ${quizzes.length}`;
+
+    // =========================================================================
+    // 8. CUSTOM NOTE, QUIZ & JSON STUDY PACK BUILDERS
+    // =========================================================================
+    function addCustomFlashcardFromForm() {
+      var mod = (document.getElementById("inputFcModule").value || "Custom Module").trim();
+      var cat = (document.getElementById("inputFcCategory").value || "Custom Notes").trim();
+      var slide = (document.getElementById("inputFcSlide").value || "Custom Note").trim();
+      var pearl = (document.getElementById("inputFcPearl").value || "Key point added from study notes.").trim();
+      var q = (document.getElementById("inputFcQuestion").value || "").trim();
+      var a = (document.getElementById("inputFcAnswer").value || "").trim();
+
+      if (!q || !a) {
+        showToast("Please enter both a Question/Concept and an Answer.");
+        return;
+      }
+
+      var newCard = {
+        id: "cust_fc_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        module: mod,
+        category: cat,
+        slide: slide,
+        question: q,
+        answer: a,
+        pearl: pearl
+      };
+
+      appState.customFlashcards.push(newCard);
+      appState.activeModule = mod;
+      saveProgress();
+      rebuildFlashcardDeck();
+      document.getElementById("inputFcQuestion").value = "";
+      document.getElementById("inputFcAnswer").value = "";
+      document.getElementById("inputFcPearl").value = "";
+      showToast("Added flashcard to '" + mod + "'!");
     }
-    document.getElementById(`qz-rat-${qIdx}`).style.display = 'block';
-}
 
-function checkCase(cIdx, oIdx, btn) {
-    const cases = getFilteredCases();
-    const item = cases[cIdx];
-    const parent = btn.parentElement;
-    const buttons = parent.querySelectorAll('.option-btn');
-    buttons.forEach((b, i) => {
-        b.disabled = true;
-        if (i === item.ans) b.classList.add('correct');
-        else if (i === oIdx) b.classList.add('wrong');
+    function addCustomQuizFromForm() {
+      var mod = (document.getElementById("inputQzModule").value || "Custom Module").trim();
+      var promptText = (document.getElementById("inputQzPrompt").value || "").trim();
+      var opt0 = (document.getElementById("inputQzOpt0").value || "").trim();
+      var opt1 = (document.getElementById("inputQzOpt1").value || "").trim();
+      var opt2 = (document.getElementById("inputQzOpt2").value || "").trim();
+      var opt3 = (document.getElementById("inputQzOpt3").value || "").trim();
+      var correctIdx = parseInt(document.getElementById("inputQzCorrect").value, 10) || 0;
+      var exp = (document.getElementById("inputQzExplanation").value || "Review lecture notes for details.").trim();
+
+      if (!promptText || !opt0 || !opt1) {
+        showToast("Please enter a question stem and at least Options A and B.");
+        return;
+      }
+
+      var newQ = {
+        id: "cust_qz_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        module: mod,
+        category: "Custom Module",
+        slide: mod,
+        question: promptText,
+        options: [opt0, opt1, opt2 || "None of the above", opt3 || "All of the above"],
+        correctIndex: correctIdx,
+        explanation: exp
+      };
+
+      appState.customQuiz.push(newQ);
+      appState.activeModule = mod;
+      saveProgress();
+      setQuizCategory("All");
+      document.getElementById("inputQzPrompt").value = "";
+      document.getElementById("inputQzOpt0").value = "";
+      document.getElementById("inputQzOpt1").value = "";
+      document.getElementById("inputQzOpt2").value = "";
+      document.getElementById("inputQzOpt3").value = "";
+      document.getElementById("inputQzExplanation").value = "";
+      showToast("Added quiz question to '" + mod + "'!");
+    }
+
+    function loadSampleTemplateJson() {
+      var sample = {
+        module: "Ch 2: Enzymes & Bioenergetics",
+        flashcards: [
+          {
+            category: "Basics & Feedback",
+            slide: "Slide 5",
+            question: "How do enzymes speed up biochemical reactions in the body?",
+            answer: "Enzymes act as biological catalysts that lower the activation energy required for a reaction without being consumed in the process.",
+            pearl: "Enzymes lower Activation Energy (Ea) but never change the reaction's equilibrium (Delta G)."
+          }
+        ],
+        quiz: [
+          {
+            category: "Classification & Transport",
+            slide: "Slide 10",
+            question: "What happens to enzyme activity when body temperature rises far above optimal physiological levels (>45°C)?",
+            options: [
+              "Enzyme activity increases indefinitely",
+              "The enzyme's 3D active site denatures (unfolds), causing loss of catalytic function",
+              "The enzyme converts into a steroid hormone",
+              "Substrate binding becomes irreversible covalent bonding"
+            ],
+            correctIndex: 1,
+            explanation: "Extreme heat breaks weak hydrogen and ionic bonds maintaining tertiary structure, denaturing the active site."
+          }
+        ],
+        cases: [
+          {
+            title: "Case Study: Acute Myocardial Enzyme Elevation",
+            slide: "Clinical Case · Enzymes",
+            disorder: "Diagnostic Cardiac Isoenzymes",
+            scenario: "A 58-year-old patient presents with crushing chest pain radiating to the left arm. Lab panel checks serum Troponin and CK-MB levels.",
+            vitals: ["Age: 58yo", "Symptom: Chest Pain", "Test: Serum CK-MB & Troponin"],
+            steps: [
+              {
+                q: "Why do intracellular enzymes like CK-MB appear in the bloodstream after myocardial injury?",
+                a: "When cardiac muscle cells are damaged by ischemia, their plasma membranes lose integrity and leak intracellular enzymes (CK-MB) and proteins (Troponin) into the blood."
+              }
+            ]
+          }
+        ]
+      };
+      document.getElementById("inputBulkJson").value = JSON.stringify(sample, null, 2);
+      showToast("Sample Chapter JSON loaded — click 'Import Study Pack into App' to test!");
+    }
+
+    function importJsonStudyPack() {
+      var raw = (document.getElementById("inputBulkJson").value || "").trim();
+      if (!raw) {
+        showToast("Please paste a JSON Study Pack or click 'Fill Sample Chapter Template' first.");
+        return;
+      }
+      try {
+        var firstBrace = raw.indexOf("{");
+        var lastBrace = raw.lastIndexOf("}");
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          raw = raw.substring(firstBrace, lastBrace + 1);
+        }
+        var pack = JSON.parse(raw);
+        var modName = (pack.module || "Imported Module").trim();
+        var addedFc = 0;
+        var addedQz = 0;
+        var addedCs = 0;
+
+        if (Array.isArray(pack.flashcards)) {
+          for (var i = 0; i < pack.flashcards.length; i++) {
+            var fc = pack.flashcards[i];
+            if (fc && fc.question && fc.answer) {
+              appState.customFlashcards.push({
+                id: "imp_fc_" + Date.now() + "_" + i,
+                module: fc.module || modName,
+                category: fc.category || "Basics & Feedback",
+                slide: fc.slide || modName,
+                question: fc.question,
+                answer: fc.answer,
+                pearl: fc.pearl || "Imported study note."
+              });
+              addedFc++;
+            }
+          }
+        }
+        if (Array.isArray(pack.quiz)) {
+          for (var j = 0; j < pack.quiz.length; j++) {
+            var qz = pack.quiz[j];
+            if (qz && qz.question && Array.isArray(qz.options)) {
+              appState.customQuiz.push({
+                id: "imp_qz_" + Date.now() + "_" + j,
+                module: qz.module || modName,
+                category: qz.category || "Metabolism & Clinical",
+                slide: qz.slide || modName,
+                question: qz.question,
+                options: qz.options,
+                correctIndex: typeof qz.correctIndex === "number" ? qz.correctIndex : 0,
+                explanation: qz.explanation || ""
+              });
+              addedQz++;
+            }
+          }
+        }
+        if (Array.isArray(pack.cases)) {
+          for (var k = 0; k < pack.cases.length; k++) {
+            var cs = pack.cases[k];
+            if (cs && cs.title && Array.isArray(cs.steps)) {
+              appState.customCases.push({
+                id: "imp_cs_" + Date.now() + "_" + k,
+                module: cs.module || modName,
+                title: cs.title,
+                slide: cs.slide || modName,
+                disorder: cs.disorder || modName,
+                scenario: cs.scenario || "",
+                vitals: Array.isArray(cs.vitals) ? cs.vitals : [],
+                steps: cs.steps
+              });
+              addedCs++;
+            }
+          }
+        }
+
+        appState.activeModule = modName;
+        saveProgress();
+        rebuildFlashcardDeck();
+        setQuizCategory("All");
+        var allCs = getAllCases();
+        if (allCs.length > 0) {
+          appState.activeCaseId = allCs[0].id;
+        }
+        renderCasesView();
+        renderShortNotesView();
+        document.getElementById("inputBulkJson").value = "";
+        showToast("Imported '" + modName + "' (" + addedFc + " cards, " + addedQz + " Qs, " + addedCs + " cases)!");
+      } catch (err) {
+        showToast("Invalid JSON format. Please check the JSON text and try again.");
+      }
+    }
+
+    function exportCustomDataJson() {
+      var exportPayload = {
+        module: "Custom Backup Pack",
+        flashcards: appState.customFlashcards,
+        quiz: appState.customQuiz,
+        cases: appState.customCases
+      };
+      var jsonStr = JSON.stringify(exportPayload, null, 2);
+      var box = document.getElementById("inputBulkJson");
+      if (box) {
+        box.value = jsonStr;
+        box.select();
+        try {
+          document.execCommand("copy");
+          showToast("Backup JSON copied to clipboard and shown in the box below!");
+        } catch (err) {
+          showToast("Backup JSON generated in the text box below!");
+        }
+      }
+    }
+
+    // =========================================================================
+    // 9. SHORT NOTES & AUTOMATIC IN-BROWSER PDF / PPTX CONVERTER ENGINE
+    // =========================================================================
+    function renderShortNotesView() {
+      var container = document.getElementById("shortNotesContainer");
+      if (!container) return;
+      var query = ((document.getElementById("inputSearchNotes") || {}).value || "").toLowerCase().trim();
+      var cards = getAllFlashcards();
+      var notesBtn = document.getElementById("tabBtnNotes");
+      if (notesBtn) {
+        notesBtn.textContent = "Short Notes (" + cards.length + ")";
+      }
+
+      var filtered = [];
+      for (var i = 0; i < cards.length; i++) {
+        var c = cards[i];
+        if (!query ||
+            (c.question && c.question.toLowerCase().indexOf(query) !== -1) ||
+            (c.answer && c.answer.toLowerCase().indexOf(query) !== -1) ||
+            (c.pearl && c.pearl.toLowerCase().indexOf(query) !== -1) ||
+            (c.category && c.category.toLowerCase().indexOf(query) !== -1)) {
+          filtered.push(c);
+        }
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="col-span-2 bg-white p-6 rounded-2xl border border-slate-200 text-center text-sm text-slate-500">No matching short notes found. Try clearing the search box.</div>';
+        return;
+      }
+
+      var html = "";
+      for (var j = 0; j < filtered.length; j++) {
+        var item = filtered[j];
+        html += '<div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-3">' +
+          '<div>' +
+            '<div class="flex items-center justify-between gap-2 mb-1.5">' +
+              '<span class="px-2 py-0.5 rounded text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">' + (item.module || "Study Note") + '</span>' +
+              '<span class="text-xs font-semibold text-slate-400">' + (item.slide || "") + '</span>' +
+            '</div>' +
+            '<h3 class="text-sm sm:text-base font-bold text-slate-900 leading-snug mb-2">' + item.question + '</h3>' +
+            '<p class="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed">' + item.answer + '</p>' +
+          '</div>' +
+          '<div class="bg-amber-50/80 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-950">' +
+            '<strong class="uppercase tracking-wider text-amber-800">Key Pearl: </strong>' + (item.pearl || "Review slide diagram for details.") +
+          '</div>' +
+        '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    function saveOptionalApiKey(val) {
+      appState.geminiApiKey = (val || "").trim();
+      saveProgress();
+      showToast(appState.geminiApiKey ? "Gemini AI Key saved!" : "Using built-in instant parser.");
+    }
+
+    async function extractSlidesFromPdf(file) {
+      if (typeof pdfjsLib === "undefined") {
+        throw new Error("PDF reader library is still loading. Please check your internet connection.");
+      }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      var arrayBuf = await file.arrayBuffer();
+      var pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+      var pages = [];
+      for (var i = 1; i <= pdf.numPages; i++) {
+        var page = await pdf.getPage(i);
+        var textContent = await page.getTextContent();
+        var lines = [];
+        var currentLine = "";
+        var lastY = null;
+        for (var j = 0; j < textContent.items.length; j++) {
+          var item = textContent.items[j];
+          var y = item.transform ? Math.round(item.transform[5]) : null;
+          if (lastY !== null && y !== null && Math.abs(y - lastY) > 6) {
+            if (currentLine.trim()) lines.push(currentLine.trim());
+            currentLine = item.str;
+          } else {
+            currentLine += (currentLine ? " " : "") + item.str;
+          }
+          lastY = y;
+        }
+        if (currentLine.trim()) lines.push(currentLine.trim());
+        var joined = lines.join("\n").trim();
+        if (joined.length > 20) {
+          pages.push({ pageNum: i, lines: lines, text: joined });
+        }
+      }
+      return pages;
+    }
+
+    async function extractSlidesFromPptx(file) {
+      if (typeof JSZip === "undefined") {
+        throw new Error("PPTX reader library is still loading.");
+      }
+      var arrayBuf = await file.arrayBuffer();
+      var zip = await JSZip.loadAsync(arrayBuf);
+      var slideFiles = [];
+      zip.forEach(function (relPath) {
+        var m = relPath.match(/^ppt\/slides\/slide(\d+)\.xml$/);
+        if (m) {
+          slideFiles.push({ num: parseInt(m[1], 10), path: relPath });
+        }
+      });
+      slideFiles.sort(function (a, b) { return a.num - b.num; });
+      var pages = [];
+      for (var i = 0; i < slideFiles.length; i++) {
+        var xmlStr = await zip.file(slideFiles[i].path).async("string");
+        var paragraphs = xmlStr.split(/<\/a:p>/g);
+        var lines = [];
+        for (var p = 0; p < paragraphs.length; p++) {
+          var matches = paragraphs[p].match(/<a:t[^>]*>([^<]*)<\/a:t>/g);
+          if (matches) {
+            var lineText = matches.map(function (t) {
+              return t.replace(/<[^>]+>/g, "");
+            }).join("").trim();
+            if (lineText) lines.push(lineText);
+          }
+        }
+        var joined = lines.join("\n").trim();
+        if (joined.length > 20) {
+          pages.push({ pageNum: slideFiles[i].num, lines: lines, text: joined });
+        }
+      }
+      return pages;
+    }
+
+    function buildStudyPackFromSlides(moduleName, pages) {
+      var flashcards = [];
+      var quiz = [];
+      var cases = [];
+      var distractorPool = [];
+
+      for (var i = 0; i < pages.length; i++) {
+        var pg = pages[i];
+        var lines = pg.lines.filter(function (l) { return l && l.trim().length > 2; });
+        if (lines.length === 0) continue;
+
+        var title = lines[0].length <= 95 ? lines[0] : lines[0].substring(0, 92) + "...";
+        var bodyLines = lines.slice(1);
+        var bodyText = bodyLines.join("\n").trim();
+        if (!bodyText && lines.length === 1) {
+          bodyText = lines[0];
+        }
+        if (bodyText.length < 25) continue;
+
+        var lowerAll = pg.text.toLowerCase();
+        var isCaseSlide = (
+          lowerAll.indexOf("case ") !== -1 ||
+          lowerAll.indexOf("scenario") !== -1 ||
+          lowerAll.indexOf("patient") !== -1 ||
+          lowerAll.indexOf("clinical question") !== -1 ||
+          lowerAll.indexOf("diagnosis") !== -1
+        );
+
+        var cat = "Basics & Feedback";
+        if (lowerAll.indexOf("receptor") !== -1 || lowerAll.indexOf("signal") !== -1 || lowerAll.indexOf("camp") !== -1 || lowerAll.indexOf("enzyme") !== -1 || lowerAll.indexOf("atp") !== -1) {
+          cat = "Receptors & Signaling";
+        } else if (lowerAll.indexOf("transport") !== -1 || lowerAll.indexOf("class") !== -1 || lowerAll.indexOf("structure") !== -1 || lowerAll.indexOf("acid") !== -1) {
+          cat = "Classification & Transport";
+        } else if (lowerAll.indexOf("disease") !== -1 || lowerAll.indexOf("diabetes") !== -1 || lowerAll.indexOf("glucose") !== -1 || lowerAll.indexOf("metabolism") !== -1 || isCaseSlide) {
+          cat = "Metabolism & Cases";
+        }
+
+        var shortSummary = bodyLines.slice(0, 5).join(" • ");
+        if (shortSummary.length > 180) {
+          shortSummary = shortSummary.substring(0, 177) + "...";
+        }
+        if (shortSummary.length > 20) {
+          distractorPool.push({ title: title, summary: shortSummary });
+        }
+
+        var qPrompt = (title.indexOf("?") !== -1)
+          ? title
+          : "Explain the key mechanism & nursing concepts of: " + title;
+
+        var pearlLine = bodyLines[bodyLines.length - 1] || title;
+        if (pearlLine.length > 140) pearlLine = pearlLine.substring(0, 137) + "...";
+
+        flashcards.push({
+          module: moduleName,
+          category: cat,
+          slide: "Slide " + pg.pageNum,
+          question: qPrompt,
+          answer: bodyText.length > 520 ? bodyText.substring(0, 517) + "..." : bodyText,
+          pearl: pearlLine
+        });
+
+        if (isCaseSlide && cases.length < 10) {
+          cases.push({
+            module: moduleName,
+            title: "Slide " + pg.pageNum + ": " + title,
+            slide: "Slide " + pg.pageNum + " · Extracted Clinical Case",
+            disorder: moduleName,
+            scenario: bodyText.length > 420 ? bodyText.substring(0, 417) + "..." : bodyText,
+            vitals: ["Slide " + pg.pageNum, cat],
+            steps: [
+              {
+                q: "What are the key biochemical and clinical takeaways from this case (" + title + ")?",
+                a: bodyText
+              }
+            ]
+          });
+        }
+      }
+
+      // Limit flashcards to top 30 well-spaced cards if deck is huge
+      if (flashcards.length > 30) {
+        var step = flashcards.length / 30;
+        var sampled = [];
+        for (var s = 0; s < 30; s++) {
+          sampled.push(flashcards[Math.floor(s * step)]);
+        }
+        flashcards = sampled;
+      }
+
+      // Generate up to 15 MCQs from extracted concepts
+      var maxQ = Math.min(15, distractorPool.length);
+      for (var qIdx = 0; qIdx < maxQ; qIdx++) {
+        var item = distractorPool[qIdx];
+        var wrongOpts = [];
+        for (var w = 1; w <= 3; w++) {
+          var other = distractorPool[(qIdx + w * 2) % distractorPool.length];
+          if (other && other.summary !== item.summary) {
+            wrongOpts.push(other.summary);
+          } else {
+            wrongOpts.push("Unrelated pathway not involved in " + item.title);
+          }
+        }
+        var correctPos = qIdx % 4;
+        var opts = wrongOpts.slice(0, 3);
+        opts.splice(correctPos, 0, item.summary);
+
+        quiz.push({
+          module: moduleName,
+          category: "Metabolism & Clinical",
+          slide: "Auto-Quiz #" + (qIdx + 1),
+          question: "Which statement accurately describes '" + item.title + "' from " + moduleName + "?",
+          options: opts,
+          correctIndex: correctPos,
+          explanation: "From " + moduleName + " (" + item.title + "): " + item.summary
+        });
+      }
+
+      if (cases.length === 0 && flashcards.length > 0) {
+        cases.push({
+          module: moduleName,
+          title: moduleName + " — Core Clinical Summary",
+          slide: "Chapter Overview",
+          disorder: moduleName,
+          scenario: flashcards[0].answer,
+          vitals: [moduleName, flashcards.length + " Study Cards"],
+          steps: [
+            {
+              q: "Summarize the primary biochemical mechanism covered in " + moduleName + ":",
+              a: flashcards.slice(0, 3).map(function (x) { return "• " + x.question + ": " + x.answer; }).join("\n\n")
+            }
+          ]
+        });
+      }
+
+      return {
+        module: moduleName,
+        flashcards: flashcards,
+        quiz: quiz,
+        cases: cases
+      };
+    }
+
+    async function processUploadedLectureFile() {
+      var fileInput = document.getElementById("inputPdfFilePicker");
+      var statusEl = document.getElementById("uploadProgressStatus");
+      var customNameInput = document.getElementById("inputAutoChapterName");
+
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        showToast("Please select a .pdf or .pptx file first!");
+        return;
+      }
+
+      var file = fileInput.files[0];
+      var baseName = file.name.replace(/\.(pdf|pptx|txt)$/i, "").replace(/[_-]+/g, " ").trim();
+      var moduleName = (customNameInput && customNameInput.value.trim())
+        ? customNameInput.value.trim()
+        : ("Ch: " + baseName.substring(0, 36));
+
+      try {
+        statusEl.textContent = "Reading slides from '" + file.name + "'...";
+        var pages = [];
+        var lowerName = file.name.toLowerCase();
+        if (lowerName.endsWith(".pdf")) {
+          pages = await extractSlidesFromPdf(file);
+        } else if (lowerName.endsWith(".pptx")) {
+          pages = await extractSlidesFromPptx(file);
+        } else {
+          var rawTxt = await file.text();
+          var chunks = rawTxt.split(/\n\s*\n/);
+          for (var c = 0; c < chunks.length; c++) {
+            if (chunks[c].trim().length > 25) {
+              pages.push({ pageNum: c + 1, lines: chunks[c].trim().split("\n"), text: chunks[c].trim() });
+            }
+          }
+        }
+
+        if (!pages || pages.length === 0) {
+          statusEl.textContent = "Could not extract text (PDF may be scanned images).";
+          showToast("No selectable text found in file.");
+          return;
+        }
+
+        var pack = null;
+        if (appState.geminiApiKey) {
+          statusEl.textContent = "Generating AI Flashcards, Quiz & Notes via Gemini...";
+          try {
+            var combinedText = pages.map(function (p) { return "Slide " + p.pageNum + ":\n" + p.text; }).join("\n\n").substring(0, 28000);
+            var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(appState.geminiApiKey), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{
+                    text: "Convert these lecture slides into a JSON study pack with keys: module ('" + moduleName + "'), flashcards (array of {category, slide, question, answer, pearl}), quiz (array of {category, slide, question, options:[4 strings], correctIndex:0..3, explanation}), cases (array of {title, slide, disorder, scenario, vitals:[strings], steps:[{q,a}]}). Return ONLY valid JSON:\n\n" + combinedText
+                  }]
+                }]
+              })
+            });
+            if (resp.ok) {
+              var data = await resp.json();
+              var aiText = (((data.candidates || [])[0] || {}).content || {}).parts[0].text || "";
+              var fb = aiText.indexOf("{");
+              var lb = aiText.lastIndexOf("}");
+              if (fb !== -1 && lb > fb) {
+                pack = JSON.parse(aiText.substring(fb, lb + 1));
+              }
+            }
+          } catch (aiErr) {
+            // Fall back seamlessly to built-in smart parser
+            pack = null;
+          }
+        }
+
+        if (!pack) {
+          statusEl.textContent = "Classifying " + pages.length + " slides into Notes, Flashcards, Quiz & Cases...";
+          pack = buildStudyPackFromSlides(moduleName, pages);
+        }
+
+        document.getElementById("inputBulkJson").value = JSON.stringify(pack, null, 2);
+        importJsonStudyPack();
+        statusEl.textContent = "Done! Added '" + moduleName + "' (" + pack.flashcards.length + " Notes/Cards, " + pack.quiz.length + " Quiz Qs, " + pack.cases.length + " Cases)";
+        switchTab("notes");
+      } catch (err) {
+        statusEl.textContent = "Error reading file: " + (err.message || "Unknown error");
+        showToast("Could not read file: " + (err.message || "Check file format"));
+      }
+    }
+
+    // Initialize App on Load
+    window.addEventListener("DOMContentLoaded", function () {
+      loadSavedProgress();
+      refreshModuleDropdown();
+      updateTopScoreBar();
+      rebuildFlashcardDeck();
+      renderQuizQuestion();
+      renderCasesView();
+      renderShortNotesView();
     });
-    document.getElementById(`cs-rat-${cIdx}`).style.display = 'block';
-}
-
-function switchTab(tab) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(`panel-${tab}`).classList.add('active');
-    event.target.classList.add('active');
-}
-
-function filterChapter() {
-    state.chapter = document.getElementById('chapter-select').value;
-    state.currentIndex = 0;
-    state.isFlipped = false;
-    renderAll();
-}
-
-function addCustomCard() {
-    const ch = document.getElementById('new-ch').value;
-    const q = document.getElementById('new-q').value.trim();
-    const a = document.getElementById('new-a').value.trim();
-    if (!q || !a) return alert('Please fill both question and answer.');
-    state.customCards.push({ ch, topic: 'CUSTOM NOTE', q, a });
-    localStorage.setItem('nurb1214_custom', JSON.stringify(state.customCards));
-    document.getElementById('new-q').value = '';
-    document.getElementById('new-a').value = '';
-    alert('Flashcard saved!');
-    renderAll();
-}
-
-renderAll();
-</script>
+  </script>
 </body>
 </html>
