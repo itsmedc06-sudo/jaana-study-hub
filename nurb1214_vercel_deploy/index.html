@@ -79,6 +79,9 @@
         <button id="tabBtnCases" type="button" onclick="switchTab('cases')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-200 hover:text-white">
           Clinical Cases (8)
         </button>
+        <button id="tabBtnPbl" type="button" onclick="switchTab('pbl')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-emerald-200 hover:text-white">
+          PBL Studio
+        </button>
         <button id="tabBtnManage" type="button" onclick="switchTab('manage')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-amber-300 hover:text-white">
           + Add Notes / Modules
         </button>
@@ -309,6 +312,53 @@
 
         <!-- Interactive Sub-Questions for the Case -->
         <div id="caseStepsContainer" class="p-5 sm:p-6 space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: NURSING PBL STUDIO ==================== -->
+    <section id="viewPbl" class="hidden space-y-5">
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-br from-slate-900 via-teal-950 to-emerald-950 text-white p-5 sm:p-6 rounded-2xl shadow-md border border-teal-800/70 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">Problem-Based Learning (FILA + ADPIE)</span>
+            <h2 class="font-display text-lg sm:text-xl font-extrabold mt-1">Nursing PBL Solver &amp; Care Plan Studio</h2>
+            <p class="text-xs sm:text-sm text-teal-100/90 mt-0.5">Paste your PBL trigger scenario (or upload a PBL PDF) to automatically generate a complete <strong>FILA Table</strong>, <strong>Pathophysiology Link</strong>, <strong>Nursing Care Plan</strong>, and <strong>Group Presentation Q&amp;A</strong>.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 shrink-0">
+            <button id="btnPblSample1" type="button" onclick="loadPblSample('hypothyroid')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-teal-100 border border-white/15 transition">Sample 1: Thyroid</button>
+            <button id="btnPblSample2" type="button" onclick="loadPblSample('addison')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-teal-100 border border-white/15 transition">Sample 2: Addison's</button>
+            <button id="btnPblSample3" type="button" onclick="loadPblSample('dka')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-teal-100 border border-white/15 transition">Sample 3: Diabetes</button>
+          </div>
+        </div>
+
+        <div class="bg-white/5 border border-white/15 rounded-xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <label for="inputPblTriggerText" class="text-xs font-bold uppercase tracking-wider text-teal-200">PBL Trigger / Patient Scenario</label>
+            <div class="flex items-center gap-2">
+              <label for="inputPblFilePicker" class="text-xs text-amber-300 font-semibold cursor-pointer hover:underline">Or load from PDF/TXT:</label>
+              <input id="inputPblFilePicker" type="file" accept=".pdf,.pptx,.txt" onchange="loadPblTriggerFromFile(this)" class="text-xs text-teal-100 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-600" />
+            </div>
+          </div>
+          <textarea id="inputPblTriggerText" rows="4" placeholder="Paste your PBL trigger scenario here (e.g., patient age, symptoms, vitals, lab results, history)..." class="w-full rounded-xl bg-white text-slate-900 p-3 text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span id="pblStatusText" class="text-xs font-medium text-teal-200">Tip: Add your Gemini API key in '+ Add Notes / Modules' for full AI clinical reasoning, or use built-in instant FILA mode anytime.</span>
+            <button id="btnSolvePbl" type="button" onclick="solvePblTrigger()" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition shadow-md">
+              ⚡ Generate FILA Table &amp; Nursing Care Plan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved PBL History Pills -->
+      <div id="pblSavedBar" class="hidden bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mr-1">Saved PBLs:</span>
+        <div id="pblSavedList" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
+      <!-- Generated PBL Output Workspace -->
+      <div id="pblOutputContainer" class="space-y-5">
+        <!-- Populated dynamically by renderPblOutput() -->
       </div>
     </section>
 
@@ -1432,6 +1482,8 @@
       customQuiz: [],
       customCases: [],
       customNotes: [],
+      pblHistory: [],
+      currentPbl: null,
       geminiApiKey: "", 
       // Flashcards state
       fcCategory: "All",
@@ -1509,6 +1561,9 @@
             if (Array.isArray(parsed.customNotes)) {
               appState.customNotes = parsed.customNotes;
             }
+            if (Array.isArray(parsed.pblHistory)) {
+              appState.pblHistory = parsed.pblHistory;
+            }
             if (typeof parsed.geminiApiKey === "string") {
               appState.geminiApiKey = parsed.geminiApiKey;
               var keyInput = document.getElementById("inputOptionalGeminiKey");
@@ -1532,6 +1587,7 @@
           customQuiz: appState.customQuiz,
           customCases: appState.customCases,
           customNotes: appState.customNotes,
+          pblHistory: appState.pblHistory,
           geminiApiKey: appState.geminiApiKey
         }));
       } catch (err) {
@@ -1663,6 +1719,7 @@
         flashcards: document.getElementById("viewFlashcards"),
         quiz: document.getElementById("viewQuiz"),
         cases: document.getElementById("viewCases"),
+        pbl: document.getElementById("viewPbl"),
         manage: document.getElementById("viewManage")
       };
       var btns = {
@@ -1670,6 +1727,7 @@
         flashcards: document.getElementById("tabBtnFlashcards"),
         quiz: document.getElementById("tabBtnQuiz"),
         cases: document.getElementById("tabBtnCases"),
+        pbl: document.getElementById("tabBtnPbl"),
         manage: document.getElementById("tabBtnManage")
       };
 
@@ -2670,6 +2728,475 @@
       }
     }
 
+    // =========================================================================
+    // 10. NURSING PBL (PROBLEM-BASED LEARNING) STUDIO CONTROLLER
+    // =========================================================================
+    var PBL_SAMPLES = {
+      hypothyroid: {
+        title: "PBL Trigger: Cold Intolerance, Fatigue & Bradycardia (Madam Chong, 65yo)",
+        trigger: "Madam Chong, 65 years old, came to the clinic complaining of persistent tiredness, dry skin, and feeling cold most of the time. She noticed weight gain despite poor appetite. On assessment, her heart rate was 52 bpm (slow), BP 110/70 mmHg, and her speech was sluggish. Blood tests showed low T3/T4 and high TSH.",
+        data: {
+          title: "Primary Hypothyroidism (Hashimoto's Disease)",
+          facts: [
+            "65-year-old female (Madam Chong)",
+            "Chief complaints: Persistent fatigue, dry skin, cold intolerance, weight gain despite poor appetite",
+            "Physical exam: Bradycardia (HR 52 bpm), sluggish speech",
+            "Labs: Low serum T3 & T4, High serum TSH"
+          ],
+          ideas: [
+            "Primary Hypothyroidism (thyroid gland failure, e.g., Hashimoto's thyroiditis)",
+            "Rule out Secondary Hypothyroidism (ruled out because TSH is HIGH, not low)",
+            "Rule out Anemia or Depression as contributing causes of fatigue"
+          ],
+          learningIssues: [
+            "How does the Hypothalamic-Pituitary-Thyroid (HPT) negative feedback loop explain High TSH with Low T3/T4?",
+            "How are lipid-soluble T3 & T4 transported in blood (TBG) and where are their receptors located?",
+            "Why do low thyroid hormones cause bradycardia, cold intolerance, and weight gain?",
+            "What nursing education is needed for Levothyroxine administration?"
+          ],
+          actionPlan: [
+            "Confirm diagnosis with anti-TPO antibodies and lipid panel",
+            "Medical management: Oral Levothyroxine (synthetic T4) replacement",
+            "Nursing priorities: Monitor vital signs (HR/BP), keep patient warm, assess bowel function (constipation risk), educate on lifelong medication adherence"
+          ],
+          pathophysiology: "The thyroid gland fails to produce sufficient T3 and T4, reducing basal metabolic rate (BMR), heat generation, and beta-adrenergic sensitivity in the heart (causing cold intolerance, weight gain, and bradycardia). Because T3/T4 are low, the 'inhibitory ceiling' (negative feedback) on the hypothalamus and anterior pituitary is lost, causing TSH to rise high. T3/T4 are hydrophobic tyrosine derivatives transported by TBG (Thyroid-Binding Globulin) that act on nuclear receptors to regulate metabolism genes.",
+          carePlan: [
+            {
+              diagnosis: "Activity Intolerance related to decreased metabolic rate and fatigue",
+              goal: "Patient will report improved energy levels and participate in daily activities without excessive fatigue.",
+              interventions: "Schedule rest periods between activities; assist with ADLs as needed; monitor heart rate and blood pressure before and after activity."
+            },
+            {
+              diagnosis: "Hypothermia / Risk for Imbalanced Body Temperature related to slowed metabolism",
+              goal: "Patient will maintain normal body temperature (36.5°C–37.5°C) and verbalize comfort.",
+              interventions: "Provide extra blankets and warm clothing; avoid external heating pads (risk of burns due to decreased sensation); monitor temperature every 4 hours."
+            },
+            {
+              diagnosis: "Deficient Knowledge regarding lifelong thyroid hormone replacement therapy",
+              goal: "Patient will accurately explain how and when to take Levothyroxine.",
+              interventions: "Teach patient to take Levothyroxine on an empty stomach 30–60 minutes before breakfast; do not stop medication abruptly; report chest pain or palpitations immediately."
+            }
+          ],
+          vivaQa: [
+            {
+              q: "Why is TSH high when thyroid hormones (T3/T4) are low?",
+              a: "Because of the loss of negative feedback. Normally, T3 and T4 inhibit the hypothalamus (TRH) and anterior pituitary (TSH). When the thyroid fails and T3/T4 drop, the pituitary over-secretes TSH."
+            },
+            {
+              q: "How are T3 and T4 carried in the bloodstream and how do they enter target cells?",
+              a: "They are hydrophobic (lipid-soluble), so they bind to TBG (Thyroid-Binding Globulin) in plasma and diffuse directly through the cell membrane to bind intracellular/nuclear receptors."
+            },
+            {
+              q: "When should a nurse advise the patient to take Levothyroxine?",
+              a: "Every morning on an empty stomach, 30 to 60 minutes before breakfast, with plain water—avoiding calcium or iron supplements within 4 hours."
+            }
+          ]
+        }
+      },
+      addison: {
+        title: "PBL Trigger: Hypotension, Hyponatremia & Hyperpigmentation (Mr. Zul, 48yo)",
+        trigger: "Mr. Zul, 48 years old, came to the emergency department feeling very weak, dizzy, and vomiting for two days. His blood pressure was 85/50 mmHg, and his skin looked darker around the elbows and face. Blood tests showed low sodium (126 mmol/L), high potassium (5.9 mmol/L), and low serum cortisol.",
+        data: {
+          title: "Primary Adrenal Insufficiency (Addison's Disease / Crisis)",
+          facts: [
+            "48-year-old male (Mr. Zul)",
+            "Symptoms: Severe weakness, dizziness, 2-day vomiting, hyperpigmentation on elbows & face",
+            "Vitals: Severe hypotension (BP 85/50 mmHg)",
+            "Labs: Hyponatremia (Na+ 126), Hyperkalemia (K+ 5.9), Low Cortisol"
+          ],
+          ideas: [
+            "Primary Adrenal Insufficiency (Addison's Disease) / impending Addisonian Crisis",
+            "Rule out septic shock or gastroenteritis-induced hypovolemia",
+            "ACTH-driven melanocyte stimulation explaining skin hyperpigmentation"
+          ],
+          learningIssues: [
+            "What chemical class is Cortisol, how is it transported (CBG), and where is its receptor located?",
+            "Why does Aldosterone deficiency cause low Na+, high K+, and hypotension (85/50 mmHg)?",
+            "Why does low cortisol cause high ACTH and dark skin pigmentation?",
+            "What is the emergency nursing and medical management for Addisonian Crisis?"
+          ],
+          actionPlan: [
+            "Immediate IV Normal Saline (0.9% NaCl) fluid resuscitation for hypotension",
+            "Administer IV Hydrocortisone (glucocorticoid replacement) immediately",
+            "Cardiac ECG monitoring for hyperkalemia (peaked T-waves) and strict intake/output charting"
+          ],
+          pathophysiology: "Destruction of the adrenal cortex causes hyposecretion of both Cortisol (glucocorticoid) and Aldosterone (mineralocorticoid). Without aldosterone, the kidneys waste sodium and water (causing hyponatremia and hypotension) and retain potassium (hyperkalemia). Cortisol is a lipid-soluble steroid derived from cholesterol, transported by CBG (Corticosteroid-Binding Globulin), acting on nuclear receptors. Low cortisol removes negative feedback on the pituitary, raising ACTH—whose precursor (POMC) also stimulates skin melanocytes, causing dark pigmentation.",
+          carePlan: [
+            {
+              diagnosis: "Deficient Fluid Volume related to sodium and water loss and vomiting",
+              goal: "Patient will maintain BP >= 100/60 mmHg and adequate urine output (>= 30 mL/hr).",
+              interventions: "Administer prescribed IV 0.9% Normal Saline rapidly; monitor BP, HR, and orthostatic vitals every 15–30 minutes; record strict intake and output."
+            },
+            {
+              diagnosis: "Risk for Electrolyte Imbalance (Hyperkalemia & Hyponatremia) related to aldosterone deficit",
+              goal: "Serum potassium and sodium will return to normal range without cardiac arrhythmias.",
+              interventions: "Place on continuous cardiac telemetry; monitor serum K+ and Na+ closely; administer IV Hydrocortisone as ordered."
+            }
+          ],
+          vivaQa: [
+            {
+              q: "What hormone class is Cortisol and where is its receptor?",
+              a: "Cortisol is a lipid-soluble steroid hormone synthesized from cholesterol. It travels bound to CBG (Corticosteroid-Binding Globulin) and binds intracellular/nuclear receptors to alter gene transcription."
+            },
+            {
+              q: "Why does Mr. Zul have dark skin around his elbows and face?",
+              a: "Low cortisol removes negative feedback, causing high pituitary ACTH. ACTH shares a precursor molecule with MSH (melanocyte-stimulating hormone), which increases melanin production."
+            }
+          ]
+        }
+      },
+      dka: {
+        title: "PBL Trigger: Polyuria, Polydipsia & High Glucose (Type 2 Diabetes / Insulin Resistance)",
+        trigger: "An adult patient with a BMI of 34 kg/m² presents with persistent polyuria (frequent urination), polydipsia (excessive thirst), and fatigue. Laboratory testing shows fasting blood glucose of 11.4 mmol/L, HbA1c of 8.2%, and elevated circulating plasma insulin levels.",
+        data: {
+          title: "Type 2 Diabetes Mellitus (Insulin Resistance)",
+          facts: [
+            "Adult patient with BMI 34 kg/m² (obese range)",
+            "Classic symptoms: Polyuria, polydipsia, fatigue",
+            "Labs: Fasting glucose 11.4 mmol/L (>= 7.0 diagnostic), HbA1c 8.2% (>= 6.3% diagnostic), HIGH plasma insulin"
+          ],
+          ideas: [
+            "Type 2 Diabetes Mellitus driven by peripheral insulin resistance",
+            "Rule out Type 1 Diabetes (insulin levels would be absent/very low, not elevated)"
+          ],
+          learningIssues: [
+            "What receptor class does Insulin bind to (RTK), and how does GLUT4 translocation work?",
+            "Why is blood glucose high even though plasma insulin levels are elevated?",
+            "How do DPP-4 inhibitors (Sitagliptin) and GLP-1 agonists (Liraglutide) improve glycemic control?"
+          ],
+          actionPlan: [
+            "Confirm diabetes diagnosis and screen for complications (renal function, foot exam, eye exam)",
+            "Initiate lifestyle modification (diet, exercise) and oral antidiabetic therapy (e.g., Metformin / DPP-4 inhibitor)",
+            "Patient education on blood glucose self-monitoring and hypoglycemia/hyperglycemia warning signs"
+          ],
+          pathophysiology: "Normally, Insulin (a peptide hormone from pancreatic beta-cells) binds to cell-surface Tyrosine Receptor Kinases (RTK) on muscle and adipose cells, phosphorylating IRSs to move GLUT4 vesicles to the membrane for glucose uptake. In Type 2 Diabetes, target cell receptors resist insulin signaling, so glucose stays trapped in the bloodstream (hyperglycemia), pulling water into urine via osmotic diuresis (polyuria and polydipsia).",
+          carePlan: [
+            {
+              diagnosis: "Risk for Unstable Blood Glucose Level related to insulin resistance",
+              goal: "Patient will achieve fasting blood glucose between 4.0–7.0 mmol/L and demonstrate proper self-monitoring.",
+              interventions: "Monitor capillary blood glucose before meals and at bedtime; administer prescribed antidiabetic medications; teach balanced low-glycemic meal planning."
+            },
+            {
+              diagnosis: "Deficient Fluid Volume related to osmotic diuresis (polyuria)",
+              goal: "Patient will maintain adequate hydration with moist mucous membranes and stable vital signs.",
+              interventions: "Encourage oral sugar-free fluid intake; monitor intake/output and skin turgor; assess for signs of dehydration."
+            }
+          ],
+          vivaQa: [
+            {
+              q: "Why does high circulating insulin fail to lower blood glucose in this patient?",
+              a: "Due to target-cell insulin resistance: insulin binds, but the RTK receptor signaling cascade fails to translocate GLUT4 transporters to the cell membrane."
+            },
+            {
+              q: "How do Incretin-based drugs (like Sitagliptin or Liraglutide) help?",
+              a: "Sitagliptin blocks the DPP-4 enzyme to prolong natural GLP-1, while Liraglutide is a synthetic GLP-1 agonist resistant to DPP-4—both enhance meal-time insulin secretion."
+            }
+          ]
+        }
+      }
+    };
+
+    function loadPblSample(key) {
+      var sample = PBL_SAMPLES[key];
+      if (!sample) return;
+      document.getElementById("inputPblTriggerText").value = sample.trigger;
+      appState.currentPbl = JSON.parse(JSON.stringify(sample.data));
+      renderPblOutput();
+      document.getElementById("pblStatusText").textContent = "Loaded sample PBL: " + sample.title;
+      showToast("Sample PBL loaded!");
+    }
+
+    async function loadPblTriggerFromFile(inputEl) {
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+      var file = inputEl.files[0];
+      var statusEl = document.getElementById("pblStatusText");
+      try {
+        statusEl.textContent = "Extracting trigger text from '" + file.name + "'...";
+        var textOut = "";
+        var lower = file.name.toLowerCase();
+        if (lower.endsWith(".pdf")) {
+          var pages = await extractSlidesFromPdf(file);
+          textOut = pages.map(function (p) { return p.text; }).join("\n\n");
+        } else if (lower.endsWith(".pptx")) {
+          var slides = await extractSlidesFromPptx(file);
+          textOut = slides.map(function (s) { return s.text; }).join("\n\n");
+        } else {
+          textOut = await file.text();
+        }
+        document.getElementById("inputPblTriggerText").value = textOut.substring(0, 6000);
+        statusEl.textContent = "Loaded text from '" + file.name + "'. Click 'Generate FILA Table & Nursing Care Plan'!";
+        showToast("PBL file text loaded!");
+      } catch (err) {
+        statusEl.textContent = "Could not read file: " + (err.message || "Error");
+      }
+    }
+
+    function buildOfflinePblAnalysis(triggerText) {
+      var clean = triggerText.replace(/\s+/g, " ").trim();
+      var sentences = triggerText.split(/[\n.!?]+/).map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 8; });
+      var facts = sentences.slice(0, 5);
+      if (facts.length === 0) facts = [clean.substring(0, 160)];
+
+      var lower = clean.toLowerCase();
+      var title = "Clinical PBL Analysis";
+      var ideas = [
+        "Primary physiological / biochemical imbalance indicated by presenting signs and lab values",
+        "Rule out secondary endocrine, fluid-electrolyte, or metabolic causes",
+        "Assess acute complications requiring immediate nursing intervention"
+      ];
+      var learningIssues = [
+        "What is the underlying biochemical / hormonal mechanism explaining the patient's symptoms?",
+        "How are the abnormal vital signs and laboratory findings linked to target organ pathophysiology?",
+        "What are the priority nursing assessments, NANDA diagnoses, and patient education points?"
+      ];
+      var actionPlan = [
+        "Verify baseline vital signs, focused physical assessment, and relevant diagnostic lab panels",
+        "Collaborate with medical team on targeted pharmacotherapy and fluid/electrolyte correction",
+        "Monitor patient response and deliver clear discharge/medication education"
+      ];
+      var patho = "Analyze how the patient's primary trigger (" + (facts[0] || "clinical presentation") + ") disrupts cellular homeostasis, hormone/enzyme signaling, or fluid-electrolyte balance.";
+      var carePlan = [
+        {
+          diagnosis: "Risk for Physiological Instability / Imbalanced Homeostasis related to acute clinical condition",
+          goal: "Patient will maintain stable vital signs and improved symptom control within shift.",
+          interventions: "Monitor vital signs and lab values closely; administer prescribed medications on time; assess for early warning signs of deterioration."
+        },
+        {
+          diagnosis: "Deficient Knowledge related to disease process and treatment regimen",
+          goal: "Patient/family will verbalize understanding of condition, medication schedule, and red-flag symptoms.",
+          interventions: "Provide simple, structured teaching using teach-back method; reinforce medication adherence and follow-up lab appointments."
+        }
+      ];
+      var vivaQa = [
+        {
+          q: "What are the most critical abnormal cues (Facts) in this PBL trigger?",
+          a: facts.join(" | ")
+        },
+        {
+          q: "What is your top nursing priority for this patient right now?",
+          a: "Stabilize airway/breathing/circulation and abnormal vitals first, verify key lab trends, and prevent acute complications while educating the patient."
+        }
+      ];
+
+      if (lower.indexOf("thyroid") !== -1 || lower.indexOf("tsh") !== -1 || lower.indexOf("t3") !== -1 || lower.indexOf("cold") !== -1) {
+        return JSON.parse(JSON.stringify(PBL_SAMPLES.hypothyroid.data));
+      } else if (lower.indexOf("cortisol") !== -1 || lower.indexOf("addison") !== -1 || lower.indexOf("85/50") !== -1) {
+        return JSON.parse(JSON.stringify(PBL_SAMPLES.addison.data));
+      } else if (lower.indexOf("glucose") !== -1 || lower.indexOf("insulin") !== -1 || lower.indexOf("diabetes") !== -1 || lower.indexOf("hba1c") !== -1) {
+        return JSON.parse(JSON.stringify(PBL_SAMPLES.dka.data));
+      }
+
+      return {
+        title: title,
+        facts: facts,
+        ideas: ideas,
+        learningIssues: learningIssues,
+        actionPlan: actionPlan,
+        pathophysiology: patho,
+        carePlan: carePlan,
+        vivaQa: vivaQa
+      };
+    }
+
+    async function solvePblTrigger() {
+      var triggerText = (document.getElementById("inputPblTriggerText").value || "").trim();
+      var statusEl = document.getElementById("pblStatusText");
+      if (triggerText.length < 15) {
+        showToast("Please paste a PBL trigger scenario or click a Sample button first!");
+        return;
+      }
+
+      var resultData = null;
+      if (appState.geminiApiKey) {
+        statusEl.textContent = "Analyzing PBL Trigger with Gemini AI (FILA + Nursing ADPIE + Viva Q&A)...";
+        try {
+          var pblPrompt = "You are a senior Malaysian Nursing Educator (IIUM KON). Analyze this Nursing PBL trigger and return ONLY valid JSON with these exact keys: " +
+            "title (short clinical title), facts (array of 4-6 strings), ideas (array of 3-4 differential hypotheses), learningIssues (array of 3-5 study questions), " +
+            "actionPlan (array of 3-4 medical & nursing priorities), pathophysiology (clear paragraph linking biochemistry/physiology to symptoms), " +
+            "carePlan (array of 2-3 objects with {diagnosis, goal, interventions}), vivaQa (array of 3-4 objects with {q, a} for group presentation prep).\n\nPBL TRIGGER:\n" + triggerText.substring(0, 12000);
+          var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(appState.geminiApiKey), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: pblPrompt }] }] })
+          });
+          if (resp.ok) {
+            var jsonResp = await resp.json();
+            var aiStr = (((jsonResp.candidates || [])[0] || {}).content || {}).parts[0].text || "";
+            var fb = aiStr.indexOf("{");
+            var lb = aiStr.lastIndexOf("}");
+            if (fb !== -1 && lb > fb) {
+              resultData = JSON.parse(aiStr.substring(fb, lb + 1));
+            }
+          }
+        } catch (err) {
+          resultData = null;
+        }
+      }
+
+      if (!resultData) {
+        resultData = buildOfflinePblAnalysis(triggerText);
+        statusEl.textContent = appState.geminiApiKey
+          ? "AI request fell back to built-in FILA analyzer (check API key or network)."
+          : "Generated structured FILA Table & Nursing Care Plan using built-in mode!";
+      } else {
+        statusEl.textContent = "AI-Powered PBL Analysis complete! Ready for your group discussion.";
+      }
+
+      appState.currentPbl = resultData;
+      // Save to PBL history (keep latest 10)
+      appState.pblHistory.unshift({
+        id: "pbl_" + Date.now(),
+        title: resultData.title || "Saved PBL",
+        trigger: triggerText,
+        data: resultData
+      });
+      if (appState.pblHistory.length > 10) {
+        appState.pblHistory = appState.pblHistory.slice(0, 10);
+      }
+      saveProgress();
+      renderPblOutput();
+      showToast("PBL FILA & Care Plan generated!");
+    }
+
+    function loadSavedPblById(pblId) {
+      for (var i = 0; i < appState.pblHistory.length; i++) {
+        if (appState.pblHistory[i].id === pblId) {
+          document.getElementById("inputPblTriggerText").value = appState.pblHistory[i].trigger;
+          appState.currentPbl = appState.pblHistory[i].data;
+          renderPblOutput();
+          showToast("Loaded saved PBL!");
+          break;
+        }
+      }
+    }
+
+    function copyPblReport() {
+      var d = appState.currentPbl;
+      if (!d) return;
+      var lines = [];
+      lines.push("NURSING PBL REPORT: " + (d.title || "Case Analysis"));
+      lines.push("\n--- FILA TABLE ---");
+      lines.push("FACTS:\n- " + (d.facts || []).join("\n- "));
+      lines.push("\nIDEAS / HYPOTHESES:\n- " + (d.ideas || []).join("\n- "));
+      lines.push("\nLEARNING ISSUES:\n- " + (d.learningIssues || []).join("\n- "));
+      lines.push("\nACTION PLAN:\n- " + (d.actionPlan || []).join("\n- "));
+      lines.push("\n--- PATHOPHYSIOLOGY & BIOCHEMICAL LINK ---\n" + (d.pathophysiology || ""));
+      lines.push("\n--- NURSING CARE PLAN (ADPIE) ---");
+      (d.carePlan || []).forEach(function (cp, idx) {
+        lines.push((idx + 1) + ". Diagnosis: " + cp.diagnosis + "\n   Goal: " + cp.goal + "\n   Interventions: " + cp.interventions);
+      });
+      lines.push("\n--- VIVA / PRESENTATION Q&A ---");
+      (d.vivaQa || []).forEach(function (vq, idx) {
+        lines.push("Q" + (idx + 1) + ": " + vq.q + "\nA: " + vq.a);
+      });
+
+      var ta = document.createElement("textarea");
+      ta.value = lines.join("\n");
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast("Complete FILA & Care Plan copied! Ready to paste in Docs/WhatsApp.");
+      } catch (err) {
+        showToast("Could not copy automatically.");
+      }
+      document.body.removeChild(ta);
+    }
+
+    function renderPblOutput() {
+      // Update Saved PBL History bar
+      var savedBar = document.getElementById("pblSavedBar");
+      var savedList = document.getElementById("pblSavedList");
+      if (savedBar && savedList) {
+        if (appState.pblHistory && appState.pblHistory.length > 0) {
+          savedBar.classList.remove("hidden");
+          savedList.innerHTML = appState.pblHistory.map(function (item) {
+            return '<button type="button" onclick="loadSavedPblById(\'' + item.id + '\')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition">' + item.title.substring(0, 34) + '</button>';
+          }).join("");
+        } else {
+          savedBar.classList.add("hidden");
+        }
+      }
+
+      var container = document.getElementById("pblOutputContainer");
+      if (!container) return;
+      var d = appState.currentPbl;
+      if (!d) {
+        container.innerHTML = '<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-xs sm:text-sm text-slate-500">Click any <strong>Sample</strong> button above or paste your PBL trigger to generate your FILA Table, Nursing Care Plan, and Presentation Q&amp;A.</div>';
+        return;
+      }
+
+      function renderBullets(arr, dotColor) {
+        if (!arr || arr.length === 0) return '<p class="text-xs text-slate-400">None listed</p>';
+        return '<ul class="space-y-1.5 text-xs sm:text-sm text-slate-700">' + arr.map(function (item) {
+          return '<li class="flex items-start gap-2"><span class="w-1.5 h-1.5 rounded-full ' + dotColor + ' mt-1.5 shrink-0"></span><span>' + item + '</span></li>';
+        }).join("") + '</ul>';
+      }
+
+      var careHtml = (d.carePlan || []).map(function (cp, idx) {
+        return '<div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-1.5">' +
+          '<div class="text-xs font-bold uppercase tracking-wider text-teal-800">Nursing Diagnosis #' + (idx + 1) + '</div>' +
+          '<p class="text-sm font-bold text-slate-900">' + cp.diagnosis + '</p>' +
+          '<p class="text-xs sm:text-sm text-emerald-900"><strong>Goal:</strong> ' + cp.goal + '</p>' +
+          '<p class="text-xs sm:text-sm text-slate-700"><strong>Interventions &amp; Rationale:</strong> ' + cp.interventions + '</p>' +
+        '</div>';
+      }).join("");
+
+      var vivaHtml = (d.vivaQa || []).map(function (vq, idx) {
+        return '<div class="border border-amber-200/80 rounded-xl p-4 bg-amber-50/50 space-y-1.5">' +
+          '<p class="text-xs sm:text-sm font-bold text-slate-900">Q' + (idx + 1) + ': ' + vq.q + '</p>' +
+          '<p class="text-xs sm:text-sm text-slate-700 leading-relaxed">' + vq.a + '</p>' +
+        '</div>';
+      }).join("");
+
+      container.innerHTML =
+        '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">' +
+          '<div>' +
+            '<span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Structured PBL Solution</span>' +
+            '<h3 class="font-display text-base sm:text-lg font-extrabold text-slate-900">' + (d.title || "PBL Case Analysis") + '</h3>' +
+          '</div>' +
+          '<button id="btnCopyPblReport" type="button" onclick="copyPblReport()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shrink-0">Copy Full FILA &amp; Care Plan</button>' +
+        '</div>' +
+
+        '<!-- 4-Quadrant FILA Table -->' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+          '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-sky-600 space-y-2.5">' +
+            '<h4 class="font-display text-sm font-extrabold text-sky-900 uppercase tracking-wider">F — Facts (Patient Cues &amp; Labs)</h4>' +
+            renderBullets(d.facts, "bg-sky-600") +
+          '</div>' +
+          '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-purple-600 space-y-2.5">' +
+            '<h4 class="font-display text-sm font-extrabold text-purple-900 uppercase tracking-wider">I — Ideas (Hypotheses &amp; Differentials)</h4>' +
+            renderBullets(d.ideas, "bg-purple-600") +
+          '</div>' +
+          '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-amber-500 space-y-2.5">' +
+            '<h4 class="font-display text-sm font-extrabold text-amber-900 uppercase tracking-wider">L — Learning Issues (What to Research)</h4>' +
+            renderBullets(d.learningIssues, "bg-amber-500") +
+          '</div>' +
+          '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-600 space-y-2.5">' +
+            '<h4 class="font-display text-sm font-extrabold text-emerald-900 uppercase tracking-wider">A — Action Plan (Priorities &amp; Management)</h4>' +
+            renderBullets(d.actionPlan, "bg-emerald-600") +
+          '</div>' +
+        '</div>' +
+
+        '<!-- Pathophysiology & Biochem Link -->' +
+        '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-2">' +
+          '<h4 class="font-display text-sm font-extrabold text-teal-900 uppercase tracking-wider">Pathophysiology &amp; Biochemical Mechanism</h4>' +
+          '<p class="text-xs sm:text-sm text-slate-700 leading-relaxed">' + (d.pathophysiology || "") + '</p>' +
+        '</div>' +
+
+        '<!-- Nursing Care Plan -->' +
+        '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">' +
+          '<h4 class="font-display text-sm font-extrabold text-teal-900 uppercase tracking-wider">Nursing Care Plan (NANDA &amp; Interventions)</h4>' +
+          '<div class="space-y-3">' + careHtml + '</div>' +
+        '</div>' +
+
+        '<!-- PBL Presentation / Viva Q&A -->' +
+        '<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">' +
+          '<h4 class="font-display text-sm font-extrabold text-amber-900 uppercase tracking-wider">Group Presentation &amp; Lecturer Viva Q&amp;A Prep</h4>' +
+          '<div class="space-y-2.5">' + vivaHtml + '</div>' +
+        '</div>';
+    }
+
     // Initialize App on Load
     window.addEventListener("DOMContentLoaded", function () {
       loadSavedProgress();
@@ -2679,6 +3206,10 @@
       renderQuizQuestion();
       renderCasesView();
       renderShortNotesView();
+      if (!appState.currentPbl) {
+        appState.currentPbl = JSON.parse(JSON.stringify(PBL_SAMPLES.hypothyroid.data));
+      }
+      renderPblOutput();
     });
   </script>
 </body>
