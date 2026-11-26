@@ -93,12 +93,23 @@
   <div class="bg-white border-b border-slate-200">
     <div class="max-w-5xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
       <div class="flex flex-wrap items-center gap-3 sm:gap-4">
-        <div class="flex items-center gap-1.5">
-          <label for="moduleSelectDropdown" class="text-xs font-bold uppercase tracking-wider text-teal-800">Chapter:</label>
-          <select id="moduleSelectDropdown" onchange="setActiveModule(this.value)" class="text-xs sm:text-sm font-semibold bg-teal-50 border border-teal-300 text-teal-900 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500">
-            <option value="ALL">All Chapters (Combined)</option>
-            <option value="Hormones (NURB 1214)">Ch 1: Hormones (NURB 1214)</option>
-          </select>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1.5">
+            <label for="folderSelectDropdown" class="text-xs font-bold uppercase tracking-wider text-emerald-800">Folder:</label>
+            <select id="folderSelectDropdown" onchange="setActiveFolder(this.value)" class="text-xs sm:text-sm font-semibold bg-emerald-50 border border-emerald-300 text-emerald-950 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="ALL">All Folders</option>
+              <option value="NURB 1214 Biochemistry">NURB 1214 Biochemistry</option>
+            </select>
+            <button id="btnOpenNewFolderModal" type="button" onclick="openNewFolderModal()" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm">
+              + New Folder
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <label for="moduleSelectDropdown" class="text-xs font-bold uppercase tracking-wider text-teal-800">Chapter:</label>
+            <select id="moduleSelectDropdown" onchange="setActiveModule(this.value)" class="text-xs sm:text-sm font-semibold bg-teal-50 border border-teal-300 text-teal-900 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-teal-500">
+              <option value="ALL">All Chapters (Combined)</option>
+            </select>
+          </div>
         </div>
         <span class="font-medium text-slate-600">Cards Mastered: <strong id="statMasteredCount" class="text-emerald-700">0 / 24</strong></span>
         <span class="font-medium text-slate-600">Quiz Score: <strong id="statQuizScore" class="text-teal-700">0 / 15</strong></span>
@@ -334,19 +345,26 @@
 
         <div class="bg-white/5 border border-white/15 rounded-xl p-4 space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <label for="inputPblTriggerText" class="text-xs font-bold uppercase tracking-wider text-teal-200">PBL Trigger / Patient Scenario</label>
+            <div>
+              <label for="inputPblTriggerText" class="text-xs font-bold uppercase tracking-wider text-teal-200">PBL Trigger / Patient Scenario</label>
+              <p class="text-[11px] text-emerald-200/90">Write in your own words — even messy notes or short keywords work! No need to worry about grammar.</p>
+            </div>
             <div class="flex items-center gap-2">
               <label for="inputPblFilePicker" class="text-xs text-amber-300 font-semibold cursor-pointer hover:underline">Or load from PDF/TXT:</label>
               <input id="inputPblFilePicker" type="file" accept=".pdf,.pptx,.txt" onchange="loadPblTriggerFromFile(this)" class="text-xs text-teal-100 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-600" />
             </div>
           </div>
-          <textarea id="inputPblTriggerText" rows="4" placeholder="Paste your PBL trigger scenario here (e.g., patient age, symptoms, vitals, lab results, history)..." class="w-full rounded-xl bg-white text-slate-900 p-3 text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
+          <textarea id="inputPblTriggerText" rows="4" placeholder="Just type or paste anything here in simple words (e.g. '65yo lady always cold, tired, slow heart rate, low T4, high TSH' OR paste the full PBL case)..." class="w-full rounded-xl bg-white text-slate-900 p-3 text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-400"></textarea>
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <span id="pblStatusText" class="text-xs font-medium text-teal-200">Tip: Add your Gemini API key in '+ Add Notes / Modules' for full AI clinical reasoning, or use built-in instant FILA mode anytime.</span>
+            <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-emerald-200">
+              <input id="chkSimpleLanguage" type="checkbox" checked="checked" onchange="toggleSimpleLanguageMode(this.checked)" class="w-4 h-4 rounded accent-amber-400" />
+              <span>Easy-to-Understand Mode (Simple everyday English)</span>
+            </label>
             <button id="btnSolvePbl" type="button" onclick="solvePblTrigger()" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition shadow-md">
               ⚡ Generate FILA Table &amp; Nursing Care Plan
             </button>
           </div>
+          <span id="pblStatusText" class="block text-xs font-medium text-teal-200">Tip: Write naturally! The app understands messy notes, short keywords, or full PDFs.</span>
         </div>
       </div>
 
@@ -374,14 +392,23 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-teal-950/60 p-4 rounded-xl border border-teal-700/70">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-teal-950/60 p-4 rounded-xl border border-teal-700/70">
           <div>
-            <label for="inputAutoChapterName" class="block text-xs font-semibold text-teal-200 mb-1">1. Chapter Name (Optional — auto-detected from file)</label>
-            <input id="inputAutoChapterName" type="text" placeholder="e.g., Ch 3: Lipids & Membranes" class="w-full rounded-xl bg-white text-slate-900 px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-400" />
+            <label for="inputUploadFolderSelect" class="block text-xs font-semibold text-teal-200 mb-1">1. Save to Folder</label>
+            <div class="flex gap-1.5">
+              <select id="inputUploadFolderSelect" class="w-full rounded-xl bg-white text-slate-900 px-2.5 py-2 text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <option value="NURB 1214 Biochemistry">NURB 1214 Biochemistry</option>
+              </select>
+              <button id="btnInlineNewFolder" type="button" onclick="openNewFolderModal()" class="px-2.5 py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs hover:bg-emerald-400 shrink-0">+</button>
+            </div>
           </div>
           <div>
-            <label for="inputPdfFilePicker" class="block text-xs font-semibold text-teal-200 mb-1">2. Choose Lecture PDF or PPTX File</label>
-            <input id="inputPdfFilePicker" type="file" accept=".pdf,.pptx,.txt" class="w-full rounded-xl bg-white text-slate-900 px-2.5 py-1.5 text-xs sm:text-sm file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800" />
+            <label for="inputAutoChapterName" class="block text-xs font-semibold text-teal-200 mb-1">2. Chapter Name (Optional)</label>
+            <input id="inputAutoChapterName" type="text" placeholder="Auto-detected from file" class="w-full rounded-xl bg-white text-slate-900 px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-400" />
+          </div>
+          <div>
+            <label for="inputPdfFilePicker" class="block text-xs font-semibold text-teal-200 mb-1">3. Choose PDF / PPTX (Multi-select OK)</label>
+            <input id="inputPdfFilePicker" type="file" accept=".pdf,.pptx,.txt" multiple="multiple" class="w-full rounded-xl bg-white text-slate-900 px-2.5 py-1.5 text-xs sm:text-sm file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800" />
           </div>
           <div class="flex flex-col justify-end">
             <button id="btnProcessUploadedFile" type="button" onclick="processUploadedLectureFile()" class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold bg-amber-400 text-slate-950 hover:bg-amber-300 transition shadow-md">
@@ -393,7 +420,10 @@
         <!-- Optional Gemini API Key row + live status bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs text-teal-200">
           <div class="flex items-center gap-2 flex-wrap">
-            <span>Mode: <strong class="text-amber-300">Instant Smart Built-in Parser (No Key Required)</strong></span>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-emerald-200 mr-1">
+              <input id="chkUploadSimpleLanguage" type="checkbox" checked="checked" onchange="toggleSimpleLanguageMode(this.checked)" class="w-3.5 h-3.5 rounded accent-amber-400" />
+              <span>Simple English Mode</span>
+            </label>
             <span>·</span>
             <label for="inputOptionalGeminiKey" class="underline cursor-pointer">Optional Gemini AI Key:</label>
             <input id="inputOptionalGeminiKey" type="password" onchange="saveOptionalApiKey(this.value)" placeholder="Paste free AI Studio key (optional)" class="rounded-lg bg-teal-950/90 border border-teal-700 px-2.5 py-1 text-xs text-white placeholder-teal-400 w-52" />
@@ -514,6 +544,25 @@
     </section>
 
   </main>
+
+  <!-- In-Page Create Folder Modal -->
+  <div id="newFolderModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-5 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display text-lg font-extrabold text-slate-900">Create New Subject Folder</h3>
+        <button id="btnCloseFolderModal" type="button" onclick="closeNewFolderModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2">&times;</button>
+      </div>
+      <p class="text-xs text-slate-600">Organize your lectures, PDFs, and notes by subject or semester (e.g., <em>Anatomy &amp; Physiology</em>, <em>Pharmacology</em>, <em>Med-Surg Nursing</em>).</p>
+      <div>
+        <label for="inputNewFolderName" class="block text-xs font-bold text-slate-700 mb-1">Folder Name</label>
+        <input id="inputNewFolderName" type="text" placeholder="e.g., Pharmacology Sem 2" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button id="btnCancelNewFolder" type="button" onclick="closeNewFolderModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Cancel</button>
+        <button id="btnConfirmNewFolder" type="button" onclick="createNewFolderFromModal()" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition shadow-sm">Create Folder</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 mt-8">
@@ -1477,7 +1526,14 @@
     // =========================================================================
     var appState = {
       activeTab: "flashcards",
+      activeFolder: "ALL",
       activeModule: "ALL",
+      folders: ["NURB 1214 Biochemistry"],
+      moduleFolders: {
+        "Ch 1: Hormones (NURB 1214)": "NURB 1214 Biochemistry",
+        "Ch 2: Carbohydrates Metabolism I": "NURB 1214 Biochemistry"
+      },
+      simpleLanguage: true,
       customFlashcards: [],
       customQuiz: [],
       customCases: [],
@@ -1503,40 +1559,32 @@
       revealedCaseSteps: {} // "caseId_stepIdx" -> true
     };
 
+    function getModuleFolder(modName) {
+      return (appState.moduleFolders && appState.moduleFolders[modName]) || "NURB 1214 Biochemistry";
+    }
+
+    function matchesActiveFilters(item) {
+      var mod = item.module || "Ch 1: Hormones (NURB 1214)";
+      var folder = getModuleFolder(mod);
+      var folderOk = (appState.activeFolder === "ALL") || (folder === appState.activeFolder);
+      var modOk = (appState.activeModule === "ALL") || (mod === appState.activeModule);
+      return folderOk && modOk;
+    }
+
     function getAllFlashcards() {
       var all = FLASHCARDS.concat(appState.customFlashcards || []);
-      if (appState.activeModule === "ALL") return all;
-      var out = [];
-      for (var i = 0; i < all.length; i++) {
-        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
-          out.push(all[i]);
-        }
-      }
-      return out;
+      return all.filter(matchesActiveFilters);
     }
 
     function getAllQuizQuestions() {
       var all = QUIZ_QUESTIONS.concat(appState.customQuiz || []);
-      if (appState.activeModule === "ALL") return all;
-      var out = [];
-      for (var i = 0; i < all.length; i++) {
-        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
-          out.push(all[i]);
-        }
-      }
-      return out;
+      return all.filter(matchesActiveFilters);
     }
 
     function getAllCases() {
       var all = CLINICAL_CASES.concat(appState.customCases || []);
-      if (appState.activeModule === "ALL") return all;
-      var out = [];
-      for (var i = 0; i < all.length; i++) {
-        if ((all[i].module || "Ch 1: Hormones (NURB 1214)") === appState.activeModule) {
-          out.push(all[i]);
-        }
-      }
-      return out.length > 0 ? out : all;
+      var filtered = all.filter(matchesActiveFilters);
+      return filtered.length > 0 ? filtered : all;
     }
 
     function loadSavedProgress() {
@@ -1564,6 +1612,18 @@
             if (Array.isArray(parsed.pblHistory)) {
               appState.pblHistory = parsed.pblHistory;
             }
+            if (Array.isArray(parsed.folders) && parsed.folders.length > 0) {
+              appState.folders = parsed.folders;
+            }
+            if (parsed.moduleFolders && typeof parsed.moduleFolders === "object") {
+              for (var mk in parsed.moduleFolders) {
+                appState.moduleFolders[mk] = parsed.moduleFolders[mk];
+              }
+            }
+            if (typeof parsed.simpleLanguage === "boolean") {
+              appState.simpleLanguage = parsed.simpleLanguage;
+              syncSimpleCheckboxes();
+            }
             if (typeof parsed.geminiApiKey === "string") {
               appState.geminiApiKey = parsed.geminiApiKey;
               var keyInput = document.getElementById("inputOptionalGeminiKey");
@@ -1588,6 +1648,9 @@
           customCases: appState.customCases,
           customNotes: appState.customNotes,
           pblHistory: appState.pblHistory,
+          folders: appState.folders,
+          moduleFolders: appState.moduleFolders,
+          simpleLanguage: appState.simpleLanguage,
           geminiApiKey: appState.geminiApiKey
         }));
       } catch (err) {
@@ -1597,10 +1660,101 @@
       updateTopScoreBar();
     }
 
+    function openNewFolderModal() {
+      var modal = document.getElementById("newFolderModal");
+      var inp = document.getElementById("inputNewFolderName");
+      if (modal) modal.classList.remove("hidden");
+      if (inp) {
+        inp.value = "";
+        inp.focus();
+      }
+    }
+
+    function closeNewFolderModal() {
+      var modal = document.getElementById("newFolderModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function createNewFolderFromModal() {
+      var inp = document.getElementById("inputNewFolderName");
+      var name = (inp ? inp.value : "").trim();
+      if (!name) {
+        showToast("Please type a folder name first.");
+        return;
+      }
+      if (appState.folders.indexOf(name) === -1) {
+        appState.folders.push(name);
+      }
+      appState.activeFolder = name;
+      appState.activeModule = "ALL";
+      closeNewFolderModal();
+      saveProgress();
+      var uploadFolderSel = document.getElementById("inputUploadFolderSelect");
+      if (uploadFolderSel) uploadFolderSel.value = name;
+      setActiveFolder(name);
+      showToast("Created folder '" + name + "'!");
+    }
+
+    function setActiveFolder(folderVal) {
+      appState.activeFolder = folderVal || "ALL";
+      appState.activeModule = "ALL";
+      refreshModuleDropdown();
+      rebuildFlashcardDeck();
+      setQuizCategory("All");
+      var casesList = getAllCases();
+      if (casesList.length > 0) {
+        appState.activeCaseId = casesList[0].id;
+      }
+      renderCasesView();
+      renderShortNotesView();
+      updateTopScoreBar();
+    }
+
+    function syncSimpleCheckboxes() {
+      var c1 = document.getElementById("chkSimpleLanguage");
+      var c2 = document.getElementById("chkUploadSimpleLanguage");
+      if (c1) c1.checked = appState.simpleLanguage;
+      if (c2) c2.checked = appState.simpleLanguage;
+    }
+
+    function toggleSimpleLanguageMode(isChecked) {
+      appState.simpleLanguage = Boolean(isChecked);
+      syncSimpleCheckboxes();
+      saveProgress();
+      showToast(appState.simpleLanguage ? "Simple English Mode: ON (Easy words)" : "Standard Nursing Mode: ON");
+    }
+
     function refreshModuleDropdown() {
+      // 1. Populate Folder dropdowns
+      var folderSel = document.getElementById("folderSelectDropdown");
+      var uploadFolderSel = document.getElementById("inputUploadFolderSelect");
+      var fList = appState.folders || ["NURB 1214 Biochemistry"];
+      if (folderSel) {
+        var fHtml = '<option value="ALL">All Folders (' + fList.length + ')</option>';
+        for (var fi = 0; fi < fList.length; fi++) {
+          var fn = fList[fi];
+          var fSelAttr = (appState.activeFolder === fn) ? ' selected="selected"' : '';
+          fHtml += '<option value="' + fn.replace(/"/g, '&quot;') + '"' + fSelAttr + '>' + fn + '</option>';
+        }
+        folderSel.innerHTML = fHtml;
+        if (appState.activeFolder === "ALL") folderSel.value = "ALL";
+      }
+      if (uploadFolderSel) {
+        var prevUploadVal = uploadFolderSel.value;
+        var ufHtml = "";
+        for (var ui = 0; ui < fList.length; ui++) {
+          ufHtml += '<option value="' + fList[ui].replace(/"/g, '&quot;') + '">' + fList[ui] + '</option>';
+        }
+        uploadFolderSel.innerHTML = ufHtml;
+        if (fList.indexOf(prevUploadVal) !== -1) {
+          uploadFolderSel.value = prevUploadVal;
+        }
+      }
+
+      // 2. Populate Chapter dropdown filtered by activeFolder
       var selectEl = document.getElementById("moduleSelectDropdown");
       if (!selectEl) return;
-      var modulesMap = { "Ch 1: Hormones (NURB 1214)": true, "Ch 2: Carbohydrates Metabolism I": true };
+      var modulesMap = {};
       var allFc = FLASHCARDS.concat(appState.customFlashcards || []);
       var allQz = QUIZ_QUESTIONS.concat(appState.customQuiz || []);
       var allCs = CLINICAL_CASES.concat(appState.customCases || []);
@@ -1617,6 +1771,9 @@
       var keys = Object.keys(modulesMap);
       for (var m = 0; m < keys.length; m++) {
         var modName = keys[m];
+        if (appState.activeFolder !== "ALL" && getModuleFolder(modName) !== appState.activeFolder) {
+          continue;
+        }
         var sel = (appState.activeModule === modName) ? ' selected="selected"' : '';
         htmlOpts += '<option value="' + modName.replace(/"/g, '&quot;') + '"' + sel + '>' + modName + '</option>';
       }
@@ -2646,19 +2803,24 @@
       var fileInput = document.getElementById("inputPdfFilePicker");
       var statusEl = document.getElementById("uploadProgressStatus");
       var customNameInput = document.getElementById("inputAutoChapterName");
+      var folderSelectEl = document.getElementById("inputUploadFolderSelect");
+      var targetFolder = (folderSelectEl && folderSelectEl.value) ? folderSelectEl.value : "NURB 1214 Biochemistry";
 
       if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        showToast("Please select a .pdf or .pptx file first!");
+        showToast("Please select one or more .pdf or .pptx files first!");
         return;
       }
 
-      var file = fileInput.files[0];
-      var baseName = file.name.replace(/\.(pdf|pptx|txt)$/i, "").replace(/[_-]+/g, " ").trim();
-      var moduleName = (customNameInput && customNameInput.value.trim())
-        ? customNameInput.value.trim()
-        : ("Ch: " + baseName.substring(0, 36));
-
+      var files = Array.prototype.slice.call(fileInput.files);
       try {
+      for (var fIdx = 0; fIdx < files.length; fIdx++) {
+        var file = files[fIdx];
+        var baseName = file.name.replace(/\.(pdf|pptx|txt)$/i, "").replace(/[_-]+/g, " ").trim();
+        var moduleName = (files.length === 1 && customNameInput && customNameInput.value.trim())
+          ? customNameInput.value.trim()
+          : ("Ch: " + baseName.substring(0, 36));
+        appState.moduleFolders[moduleName] = targetFolder;
+        appState.activeFolder = targetFolder;
         statusEl.textContent = "Reading slides from '" + file.name + "'...";
         var pages = [];
         var lowerName = file.name.toLowerCase();
@@ -2677,15 +2839,18 @@
         }
 
         if (!pages || pages.length === 0) {
-          statusEl.textContent = "Could not extract text (PDF may be scanned images).";
-          showToast("No selectable text found in file.");
-          return;
+          statusEl.textContent = "Skipped '" + file.name + "' (no selectable text found).";
+          showToast("Skipped '" + file.name + "' — no selectable text.");
+          continue;
         }
 
         var pack = null;
         if (appState.geminiApiKey) {
-          statusEl.textContent = "Generating AI Flashcards, Quiz & Notes via Gemini...";
+          statusEl.textContent = "Generating Easy-to-Understand AI Notes, Cards & Quiz (" + (fIdx + 1) + "/" + files.length + ")...";
           try {
+            var toneRule = appState.simpleLanguage
+              ? "Write ALL answers, explanations, and pearls in very simple, clear, easy-to-understand everyday English for a nursing student (short sentences, no confusing jargon)."
+              : "Write clear academic nursing explanations.";
             var combinedText = pages.map(function (p) { return "Slide " + p.pageNum + ":\n" + p.text; }).join("\n\n").substring(0, 28000);
             var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(appState.geminiApiKey), {
               method: "POST",
@@ -2693,7 +2858,7 @@
               body: JSON.stringify({
                 contents: [{
                   parts: [{
-                    text: "Convert these lecture slides into a JSON study pack with keys: module ('" + moduleName + "'), flashcards (array of {category, slide, question, answer, pearl}), quiz (array of {category, slide, question, options:[4 strings], correctIndex:0..3, explanation}), cases (array of {title, slide, disorder, scenario, vitals:[strings], steps:[{q,a}]}). Return ONLY valid JSON:\n\n" + combinedText
+                    text: toneRule + " Convert these lecture slides into a JSON study pack with keys: module ('" + moduleName + "'), flashcards (array of {category, slide, question, answer, pearl}), quiz (array of {category, slide, question, options:[4 strings], correctIndex:0..3, explanation}), cases (array of {title, slide, disorder, scenario, vitals:[strings], steps:[{q,a}]}). Return ONLY valid JSON:\n\n" + combinedText
                   }]
                 }]
               })
@@ -2720,8 +2885,9 @@
 
         document.getElementById("inputBulkJson").value = JSON.stringify(pack, null, 2);
         importJsonStudyPack();
-        statusEl.textContent = "Done! Added '" + moduleName + "' (" + pack.flashcards.length + " Notes/Cards, " + pack.quiz.length + " Quiz Qs, " + pack.cases.length + " Cases)";
-        switchTab("notes");
+        statusEl.textContent = "Done! Added '" + moduleName + "' into folder '" + targetFolder + "' (" + pack.flashcards.length + " Notes/Cards, " + pack.quiz.length + " Quiz Qs, " + pack.cases.length + " Cases)";
+      }
+      switchTab("notes");
       } catch (err) {
         statusEl.textContent = "Error reading file: " + (err.message || "Unknown error");
         showToast("Could not read file: " + (err.message || "Check file format"));
@@ -3001,8 +3167,8 @@
     async function solvePblTrigger() {
       var triggerText = (document.getElementById("inputPblTriggerText").value || "").trim();
       var statusEl = document.getElementById("pblStatusText");
-      if (triggerText.length < 15) {
-        showToast("Please paste a PBL trigger scenario or click a Sample button first!");
+      if (triggerText.length < 4) {
+        showToast("Please type a few words about the case or click a Sample button first!");
         return;
       }
 
@@ -3010,7 +3176,10 @@
       if (appState.geminiApiKey) {
         statusEl.textContent = "Analyzing PBL Trigger with Gemini AI (FILA + Nursing ADPIE + Viva Q&A)...";
         try {
-          var pblPrompt = "You are a senior Malaysian Nursing Educator (IIUM KON). Analyze this Nursing PBL trigger and return ONLY valid JSON with these exact keys: " +
+          var simpleRule = appState.simpleLanguage
+            ? "CRITICAL: Write every bullet, pathophysiology explanation, care plan, and viva answer in super simple, friendly, easy-to-understand everyday English so a stressed nursing student can grasp it immediately (use short sentences and simple analogies). "
+            : "";
+          var pblPrompt = "You are a caring senior Malaysian Nursing Educator (IIUM KON). The student may have written rough or messy notes below—understand their intent naturally. " + simpleRule + "Analyze this Nursing PBL trigger and return ONLY valid JSON with these exact keys: " +
             "title (short clinical title), facts (array of 4-6 strings), ideas (array of 3-4 differential hypotheses), learningIssues (array of 3-5 study questions), " +
             "actionPlan (array of 3-4 medical & nursing priorities), pathophysiology (clear paragraph linking biochemistry/physiology to symptoms), " +
             "carePlan (array of 2-3 objects with {diagnosis, goal, interventions}), vivaQa (array of 3-4 objects with {q, a} for group presentation prep).\n\nPBL TRIGGER:\n" + triggerText.substring(0, 12000);
@@ -3103,6 +3272,52 @@
       document.body.removeChild(ta);
     }
 
+    async function simplifyCurrentPbl() {
+      var d = appState.currentPbl;
+      if (!d) return;
+      var statusEl = document.getElementById("pblStatusText");
+      if (appState.geminiApiKey) {
+        if (statusEl) statusEl.textContent = "Rewriting in super simple, easy-to-remember English...";
+        try {
+          var resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(appState.geminiApiKey), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: "Rewrite this Nursing PBL solution in VERY SIMPLE, warm, easy-to-understand everyday English (short sentences, plain words, and 1 easy real-life analogy in pathophysiology) for a nursing student. Return ONLY valid JSON with the exact same keys (title, facts, ideas, learningIssues, actionPlan, pathophysiology, carePlan, vivaQa):\n\n" + JSON.stringify(d)
+                }]
+              }]
+            })
+          });
+          if (resp.ok) {
+            var jsonResp = await resp.json();
+            var aiStr = (((jsonResp.candidates || [])[0] || {}).content || {}).parts[0].text || "";
+            var fb = aiStr.indexOf("{");
+            var lb = aiStr.lastIndexOf("}");
+            if (fb !== -1 && lb > fb) {
+              appState.currentPbl = JSON.parse(aiStr.substring(fb, lb + 1));
+              renderPblOutput();
+              if (statusEl) statusEl.textContent = "Simplified into super easy English!";
+              showToast("Rewritten in Simple English!");
+              return;
+            }
+          }
+        } catch (err) {
+          // fall through to offline simplifier
+        }
+      }
+
+      // Offline instant simplifier: break dense paragraphs into short, scannable plain-English lines
+      if (d.pathophysiology) {
+        var parts = d.pathophysiology.split(/\.\s+/).filter(function (s) { return s.trim().length > 0; });
+        d.pathophysiology = "In simple words: " + parts.slice(0, 4).join(". ") + ".";
+      }
+      renderPblOutput();
+      if (statusEl) statusEl.textContent = "Simplified! (Add Gemini API key for full AI plain-English rewrite.)";
+      showToast("Simplified view ready!");
+    }
+
     function renderPblOutput() {
       // Update Saved PBL History bar
       var savedBar = document.getElementById("pblSavedBar");
@@ -3155,7 +3370,10 @@
             '<span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Structured PBL Solution</span>' +
             '<h3 class="font-display text-base sm:text-lg font-extrabold text-slate-900">' + (d.title || "PBL Case Analysis") + '</h3>' +
           '</div>' +
-          '<button id="btnCopyPblReport" type="button" onclick="copyPblReport()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shrink-0">Copy Full FILA &amp; Care Plan</button>' +
+          '<div class="flex flex-wrap gap-2 shrink-0">' +
+            '<button id="btnSimplifyPbl" type="button" onclick="simplifyCurrentPbl()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">✨ Explain Simpler</button>' +
+            '<button id="btnCopyPblReport" type="button" onclick="copyPblReport()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition">Copy Full FILA &amp; Care Plan</button>' +
+          '</div>' +
         '</div>' +
 
         '<!-- 4-Quadrant FILA Table -->' +
